@@ -1,8 +1,9 @@
-import 'package:aplikasi_kasir/pages/onboarding_page.dart';
+import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -27,6 +28,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xff0E0E52),
+          foregroundColor: Colors.white,
+          titleTextStyle: TextStyle(fontSize: 20, fontFamily: 'Montserrat', fontWeight: FontWeight.w600),
+          centerTitle: true,
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
           minimumSize: const MaterialStatePropertyAll(Size.fromHeight(50)),
@@ -34,7 +41,7 @@ class MyApp extends StatelessWidget {
           elevation: const MaterialStatePropertyAll(10),
           foregroundColor: const MaterialStatePropertyAll(Colors.white),
           overlayColor: const MaterialStatePropertyAll(Colors.black38),
-          backgroundColor: MaterialStatePropertyAll(Color(0xff0E0E52)),
+          backgroundColor: const MaterialStatePropertyAll(Color(0xff0E0E52)),
         )),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
@@ -48,7 +55,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff0E0E52)),
         useMaterial3: true,
       ),
-      home: OnBoardingPage(),
+      home: const OnBoardingPage(),
     );
   }
 }

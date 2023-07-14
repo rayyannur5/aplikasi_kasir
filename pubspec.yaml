@@ -37,6 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   dio: ^5.2.1+1
   lottie: ^2.4.0
+  flutter_riverpod: ^2.3.6
+  shimmer: ^3.0.0
+  fl_chart: ^0.63.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +68,7 @@ flutter:
   assets:
     - assets/images/
     - assets/lotties/
+    - assets/icons/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

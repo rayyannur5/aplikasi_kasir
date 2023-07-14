@@ -1,13 +1,14 @@
-import 'package:aplikasi_kasir/pages/login_page.dart';
-import 'package:aplikasi_kasir/pages/register_page.dart';
+import 'package:aplikasi_kasir/pages/auth/register_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/utils/textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import 'login_page.dart';
+
 // ignore: must_be_immutable
 class OnBoardingPage extends StatefulWidget {
-  OnBoardingPage({super.key});
+  const OnBoardingPage({super.key});
 
   @override
   State<OnBoardingPage> createState() => _OnBoardingPageState();

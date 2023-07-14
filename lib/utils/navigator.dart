@@ -78,7 +78,7 @@ pushReplacement(BuildContext context, Widget child) {
   return Navigator.of(context).pushReplacement(PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 0.0);
+      const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
       const curve = Curves.decelerate;
 
@@ -110,4 +110,12 @@ materialPushReplacement(BuildContext context, Widget child) {
 
 pop(BuildContext context) {
   return Navigator.pop(context);
+}
+
+pushAndRemoveUntil(BuildContext context, Widget child) {
+  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context) {
+    return child;
+  }), (r) {
+    return false;
+  });
 }
