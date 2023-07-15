@@ -15,15 +15,15 @@ class SuksesPembayaranPage extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            Spacer(),
+            const Spacer(),
             LottieBuilder.asset('assets/lotties/success.json'),
-            Spacer(),
+            const Spacer(),
             ElevatedButton(
                 onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, const LaporanTransaksiDetailPage(id: '1'))),
                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff449DD1))),
-                child: Text('Cetak')),
-            SizedBox(height: 10),
-            ElevatedButton(onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pushAndRemoveUntil(context, KatalogPage())), child: Text('Kembali')),
+                child: const Text('Cetak')),
+            const SizedBox(height: 10),
+            ElevatedButton(onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pushAndRemoveUntil(context, KatalogPage())), child: const Text('Kembali')),
           ],
         ),
       ),

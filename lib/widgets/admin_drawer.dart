@@ -1,4 +1,8 @@
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
+import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_layanan_page.dart';
+import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_outlet_page.dart';
+import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_petugas_page.dart';
+import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_shift_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
@@ -79,12 +83,12 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 3 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Layanan Dan Harga', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 3, ManajemenLayananPage()),
               ),
               ListTile(
                 tileColor: active == 4 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Karyawan/Petugas', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 4, ManajemenPetugasPage()),
               ),
               ListTile(
                 tileColor: active == 5 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -94,12 +98,12 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 6 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Outlet/Cabang', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 6, ManajemenOutletPage()),
               ),
               ListTile(
                 tileColor: active == 7 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Jam Shift Outlet', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 7, ManajemenShiftPage()),
               ),
             ],
           ),
@@ -149,7 +153,10 @@ class DrawerAdmin extends StatelessWidget {
                 builder: (context) => CupertinoAlertDialog(
                   title: const Text('Logout'),
                   content: const Text('Apakah anda yakin untuk logout?'),
-                  actions: [TextButton(onPressed: () => pushAndRemoveUntil(context, const OnBoardingPage()), child: const Text('Logout')), TextButton(onPressed: () => pop(context), child: const Text('Batal'))],
+                  actions: [
+                    TextButton(onPressed: () => pushAndRemoveUntil(context, const OnBoardingPage()), child: const Text('Logout')),
+                    TextButton(onPressed: () => pop(context), child: const Text('Batal'))
+                  ],
                 ),
               );
             },

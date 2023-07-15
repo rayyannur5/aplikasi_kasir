@@ -20,5 +20,12 @@ var futureOpenedOutletsProvider = FutureProvider((ref) => ref.watch(servicesProv
 var futureActivedEmployeesProvider = FutureProvider((ref) => ref.watch(servicesProvider).getActivedEmployees());
 var futureOmsetComparisonProvider = FutureProvider((ref) => ref.watch(servicesProvider).getOmsetComparison());
 var futureChartTodayTransactionsProvider = FutureProvider((ref) => ref.watch(servicesProvider).getChartTodayTransactions());
-var futureGetItemsProvider = FutureProvider((ref) => ref.watch(servicesProvider).getItems());
-var futureGetKategoriesProvider = FutureProvider((ref) => ref.watch(servicesProvider).getKategories());
+var futureGetItemsProvider = FutureProvider.family((ref, int outlet_id) => ref.watch(servicesProvider).getItems(outlet_id));
+var futureGetKategoriesProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getKategories());
+
+var futureGetEmployeesProvider = FutureProvider.autoDispose.family((ref, String keyword) => ref.watch(servicesProvider).getEmployees(keyword));
+var futureGetKodeReferralProvider = FutureProvider((ref) => ref.watch(servicesProvider).getKodeReferral());
+
+var futureGetOutletsProvider = FutureProvider.autoDispose.family((ref, String keyword) => ref.watch(servicesProvider).getOutlets(keyword));
+
+var futureGetShiftProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getShift());

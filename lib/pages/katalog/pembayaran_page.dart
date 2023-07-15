@@ -19,7 +19,7 @@ class PembayaranPage extends ConsumerWidget {
     var size = MediaQuery.of(context).size;
     int selectedKategori = ref.watch(selectedKategoriProvider);
     print(selectedKategori);
-    ref.watch(futureGetItemsProvider.selectAsync((data) {
+    ref.watch(futureGetItemsProvider(1).selectAsync((data) {
       print(data);
       return items = data;
     }));
@@ -41,7 +41,7 @@ class PembayaranPage extends ConsumerWidget {
                         Text(numberFormat.format(items![i]['count'] * int.parse(items![i]['harga'])).toString(), style: TextStyles.h2),
                       ],
                     )
-                  : SizedBox(),
+                  : const SizedBox(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -60,7 +60,7 @@ class PembayaranPage extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Cash : '),
+                    const Text('Cash : '),
                     Text(numberFormat.format(amount).toString(), style: TextStyles.h1),
                   ],
                 )),
@@ -74,7 +74,7 @@ class PembayaranPage extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Kembalian : '),
+                    const Text('Kembalian : '),
                     Text(numberFormat.format(amount - price).toString(), style: TextStyles.h1),
                   ],
                 )),
@@ -135,7 +135,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '1';
+                        tempAmount = '${tempAmount}1';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('1', style: TextStyles.h2)),
@@ -146,7 +146,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '2';
+                        tempAmount = '${tempAmount}2';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('2', style: TextStyles.h2)),
@@ -157,7 +157,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '3';
+                        tempAmount = '${tempAmount}3';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('3', style: TextStyles.h2)),
@@ -183,7 +183,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '4';
+                        tempAmount = '${tempAmount}4';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('4', style: TextStyles.h2)),
@@ -194,7 +194,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '5';
+                        tempAmount = '${tempAmount}5';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('5', style: TextStyles.h2)),
@@ -205,7 +205,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '6';
+                        tempAmount = '${tempAmount}6';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('6', style: TextStyles.h2)),
@@ -221,7 +221,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '7';
+                        tempAmount = '${tempAmount}7';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('7', style: TextStyles.h2)),
@@ -232,7 +232,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '8';
+                        tempAmount = '${tempAmount}8';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('8', style: TextStyles.h2)),
@@ -243,7 +243,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '9';
+                        tempAmount = '${tempAmount}9';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('9', style: TextStyles.h2)),
@@ -258,7 +258,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '0';
+                        tempAmount = '${tempAmount}0';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('0', style: TextStyles.h2)),
@@ -269,7 +269,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '00';
+                        tempAmount = '${tempAmount}00';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('00', style: TextStyles.h2)),
@@ -280,7 +280,7 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         String tempAmount = amount.toString();
-                        tempAmount = tempAmount + '000';
+                        tempAmount = '${tempAmount}000';
                         ref.read(amountProvider.notifier).state = int.parse(tempAmount);
                       },
                       child: Text('000', style: TextStyles.h2)),
@@ -298,12 +298,12 @@ class PembayaranPage extends ConsumerWidget {
                       ref.invalidate(priceProvider);
                       ref.invalidate(selectedKategoriProvider);
                       ref.invalidate(futureGetKategoriesProvider);
-                      pushAndRemoveUntil(context, SuksesPembayaranPage());
+                      pushAndRemoveUntil(context, const SuksesPembayaranPage());
                     }
                   },
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
-                  child: Icon(Icons.arrow_forward),
+                  child: const Icon(Icons.arrow_forward),
                 ),
               ],
             )

@@ -52,7 +52,7 @@ class KatalogPage extends ConsumerWidget {
               FloatingActionButton(
                   backgroundColor: const Color(0xff449DD1),
                   foregroundColor: Colors.white,
-                  onPressed: price == 0 ? null : () => Future.delayed(Duration(milliseconds: 200), () => push(context, PembayaranPage())),
+                  onPressed: price == 0 ? null : () => Future.delayed(const Duration(milliseconds: 200), () => push(context, PembayaranPage())),
                   child: const Icon(Icons.arrow_forward)),
             ],
           ),
@@ -110,7 +110,7 @@ class KatalogPage extends ConsumerWidget {
                       highlightColor: Colors.white.withOpacity(0.5),
                       child: Container(margin: const EdgeInsets.symmetric(horizontal: 20), height: 55, color: Colors.black)),
                 ),
-            ref.watch(futureGetItemsProvider).when(
+            ref.watch(futureGetItemsProvider(1)).when(
                   skipLoadingOnRefresh: false,
                   data: (items) {
                     if (countItem.length != items.length) {
