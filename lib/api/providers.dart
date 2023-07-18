@@ -1,4 +1,5 @@
 import 'package:aplikasi_kasir/api/services.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 var servicesProvider = Provider<Services>(
@@ -29,3 +30,18 @@ var futureGetKodeReferralProvider = FutureProvider((ref) => ref.watch(servicesPr
 var futureGetOutletsProvider = FutureProvider.autoDispose.family((ref, String keyword) => ref.watch(servicesProvider).getOutlets(keyword));
 
 var futureGetShiftProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getShift());
+
+// Ringkasan AI Device
+var futureReportAIDeviceProvider = FutureProvider.autoDispose.family((ref, Map parameterReportAI) => ref.watch(servicesProvider).getAIDevice(parameterReportAI));
+var parameterReportAIProvider = StateProvider(
+  (ref) => {
+    'date': DateTimeRange(start: DateTime.now(), end: DateTime.now()),
+    'outlet_id': '1',
+  },
+);
+
+// Laporan Transaksi Admin
+var futureYearGetTransactionProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getYearReportTransaction());
+var futureMonthGetTransactionProvider = FutureProvider.autoDispose.family((ref, String year) => ref.watch(servicesProvider).getMonthReportTransaction(year));
+var futureDayGetTransactionProvider = FutureProvider.autoDispose.family((ref, String month) => ref.watch(servicesProvider).getDayReportTransaction(month));
+var futureHourGetTransactionProvider = FutureProvider.autoDispose.family((ref, String day) => ref.watch(servicesProvider).getHourReportTransaction(day));

@@ -1,4 +1,6 @@
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
+import 'package:aplikasi_kasir/pages/admin_laporan/laporan_ai_device_page.dart';
+import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_year_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_layanan_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_outlet_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_petugas_page.dart';
@@ -103,12 +105,12 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 7 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Jam Shift Outlet', style: TextStyles.pLight),
-                onTap: () => navigate(context, 7, ManajemenShiftPage()),
+                onTap: () => navigate(context, 7, const ManajemenShiftPage()),
               ),
             ],
           ),
           ExpansionTile(
-            backgroundColor: active >= 8 && active <= 11 ? Colors.white.withOpacity(0.2) : Colors.transparent,
+            collapsedBackgroundColor: active >= 8 && active <= 11 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.bookmarks_outlined),
             title: Text('Laporan', style: TextStyles.pBoldLight),
             collapsedIconColor: Colors.white,
@@ -117,12 +119,12 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 8 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Ringkasan AI Device', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 8, LaporanAIDevicePage()),
               ),
               ListTile(
                 tileColor: active == 9 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Ringkasan Transaksi Penjualan', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 9, AdminLaporanTransaksiPage()),
               ),
               ListTile(
                 tileColor: active == 10 ? Colors.white.withOpacity(0.2) : Colors.transparent,

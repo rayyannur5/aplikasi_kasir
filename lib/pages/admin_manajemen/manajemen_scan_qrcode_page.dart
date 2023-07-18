@@ -15,7 +15,7 @@ class ScanQRPage extends StatelessWidget {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       floatingActionButton:
-          FloatingActionButton(onPressed: () => Future.delayed(Duration(milliseconds: 200), () => pop(context)), child: Icon(Icons.close), backgroundColor: Colors.red, foregroundColor: Colors.white),
+          FloatingActionButton(onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), backgroundColor: Colors.red, foregroundColor: Colors.white, child: const Icon(Icons.close)),
       body: Stack(
         children: [
           MobileScanner(
@@ -32,7 +32,7 @@ class ScanQRPage extends StatelessWidget {
               } else {
                 pop(context);
                 await showCupertinoDialog(
-                    context: context, builder: (context) => CupertinoAlertDialog(content: Text('Device Tidak Valid'), actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))]));
+                    context: context, builder: (context) => CupertinoAlertDialog(content: const Text('Device Tidak Valid'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
                 cameraController.start();
               }
             },

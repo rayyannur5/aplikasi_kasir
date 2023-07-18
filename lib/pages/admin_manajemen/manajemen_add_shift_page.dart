@@ -37,12 +37,12 @@ class _AddShiftPageState extends State<AddShiftPage> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text(widget.id == '0' ? 'Tambah Shift' : 'Ubah Shift', style: TextStyle(color: Colors.black)), backgroundColor: Colors.white, foregroundColor: Colors.black),
+      appBar: AppBar(title: Text(widget.id == '0' ? 'Tambah Shift' : 'Ubah Shift', style: const TextStyle(color: Colors.black)), backgroundColor: Colors.white, foregroundColor: Colors.black),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            TextField(controller: nama, decoration: InputDecoration(labelText: 'Nama Shift')),
+            TextField(controller: nama, decoration: const InputDecoration(labelText: 'Nama Shift')),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +57,7 @@ class _AddShiftPageState extends State<AddShiftPage> {
                             child: ListTile(
                           title: Text(start!.format(context), style: TextStyles.h1),
                           onTap: () async {
-                            await Future.delayed(Duration(milliseconds: 200));
+                            await Future.delayed(const Duration(milliseconds: 200));
                             start = await showTimePicker(context: context, initialTime: start!);
                             print(start);
                             setState(() {});
@@ -75,7 +75,7 @@ class _AddShiftPageState extends State<AddShiftPage> {
                             child: ListTile(
                           title: Text(end!.format(context), style: TextStyles.h1),
                           onTap: () async {
-                            await Future.delayed(Duration(milliseconds: 200));
+                            await Future.delayed(const Duration(milliseconds: 200));
                             end = await showTimePicker(context: context, initialTime: end!);
                             print(end);
                             setState(() {});
@@ -85,27 +85,27 @@ class _AddShiftPageState extends State<AddShiftPage> {
                     )),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             ElevatedButton(
                 onPressed: () async {
                   if (nama.text.isEmpty) {
                     showCupertinoDialog(
                       context: context,
                       builder: (context) => CupertinoAlertDialog(
-                        content: Text("Nama Tidak Boleh Kosong"),
-                        actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))],
+                        content: const Text("Nama Tidak Boleh Kosong"),
+                        actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))],
                       ),
                     );
                     return;
                   }
-                  await Future.delayed(Duration(milliseconds: 200));
+                  await Future.delayed(const Duration(milliseconds: 200));
                   showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
                   if (widget.id == '0') {
                     var resp = await Services.addShift(nama.text, start!.format(context), end!.format(context));
                   } else {
                     var resp = await Services.updateShift(nama.text, start!.format(context), end!.format(context));
                   }
-                  pushAndRemoveUntil(context, ManajemenShiftPage());
+                  pushAndRemoveUntil(context, const ManajemenShiftPage());
                 },
                 child: Text(widget.id == '0' ? 'Tambah' : 'Simpan')),
           ],

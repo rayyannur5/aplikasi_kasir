@@ -16,13 +16,13 @@ class ManajemenOutletPage extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text('Manajemen Outlet')),
+      appBar: AppBar(title: const Text('Manajemen Outlet')),
       drawer: DrawerAdmin(size: size, active: 6),
       floatingActionButton: FloatingActionButton(
-          onPressed: () => Future.delayed(Duration(milliseconds: 200), () => materialPush(context, ScanQRPage())),
+          onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => materialPush(context, ScanQRPage())),
           backgroundColor: Theme.of(context).primaryColor,
           foregroundColor: Colors.white,
-          child: Icon(Icons.add)),
+          child: const Icon(Icons.add)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(futureGetOutletsProvider);
@@ -52,15 +52,15 @@ class ManajemenOutletPage extends ConsumerWidget {
             ref.watch(futureGetOutletsProvider(search.text)).when(
                   skipLoadingOnRefresh: false,
                   data: (data) => ListView.builder(
-                      padding: EdgeInsets.all(20),
-                      physics: NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: data.length,
                       itemBuilder: (context, index) => Card(
-                          color: Color(0xffF6F6F6),
+                          color: const Color(0xffF6F6F6),
                           child: ListTile(
                             title: Text(data[index]['nama'], style: TextStyles.h2),
-                            trailing: Icon(Icons.border_color),
+                            trailing: const Icon(Icons.border_color),
                             onTap: () {
                               var editOutlet = TextEditingController();
                               showCupertinoDialog(

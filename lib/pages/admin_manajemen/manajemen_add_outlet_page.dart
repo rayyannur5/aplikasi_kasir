@@ -12,7 +12,7 @@ class AddOutletPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Tambah Outlet/Cabang', style: TextStyle(color: Colors.black)), backgroundColor: Colors.white, foregroundColor: Colors.black),
+      appBar: AppBar(title: const Text('Tambah Outlet/Cabang', style: TextStyle(color: Colors.black)), backgroundColor: Colors.white, foregroundColor: Colors.black),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -20,27 +20,27 @@ class AddOutletPage extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              margin: EdgeInsets.only(bottom: 10),
-              padding: EdgeInsets.all(10),
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(10)),
               child: Text('ID Device       : ${dataDevice['id']}'),
             ),
             Container(
               width: double.infinity,
-              margin: EdgeInsets.only(bottom: 20),
-              padding: EdgeInsets.all(10),
+              margin: const EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(10)),
-              child: Text('Nama Device : ${dataDevice['nama']}', style: TextStyle(overflow: TextOverflow.ellipsis)),
+              child: Text('Nama Device : ${dataDevice['nama']}', style: const TextStyle(overflow: TextOverflow.ellipsis)),
             ),
-            TextField(decoration: InputDecoration(labelText: 'Nama Outlet')),
-            Spacer(),
+            const TextField(decoration: InputDecoration(labelText: 'Nama Outlet')),
+            const Spacer(),
             ElevatedButton(
                 onPressed: () async {
                   showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
                   await Services.addOutlet(dataDevice, nama.text);
                   pushAndRemoveUntil(context, ManajemenOutletPage());
                 },
-                child: Text('Tambah')),
+                child: const Text('Tambah')),
           ],
         ),
       ),

@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 class Services {
   final String _uri = "";
 
@@ -102,7 +105,7 @@ class Services {
     return hasil;
   }
 
-  Future<List<Map>> getItems(outlet_id) async {
+  Future<List<Map>> getItems(outletId) async {
     await Future.delayed(const Duration(seconds: 1));
 
     List<Map> hasil = [
@@ -162,7 +165,7 @@ class Services {
       },
     ];
 
-    hasil = hasil.where((element) => element['outlet_id'] == outlet_id.toString()).toList();
+    hasil = hasil.where((element) => element['outlet_id'] == outletId.toString()).toList();
 
     return hasil;
   }
@@ -267,5 +270,143 @@ class Services {
       },
     ];
     return hasil;
+  }
+
+  Future<Map> getAIDevice(Map data) async {
+    print(data);
+    String formattedBeginDate = DateFormat('yyyy-MM-dd').format(data['date'].start);
+    String formattedEndDate = DateFormat('yyyy-MM-dd').format(data['date'].end);
+    await Future.delayed(const Duration(seconds: 1));
+    Map hasil = {
+      'id': '1',
+      'data': {
+        'Tambah Angin Motor': 30,
+        'Isi Baru Motor': 20,
+        'Tambah Angin Mobil': 34,
+        'Isi Baru Mobil': 12,
+        'Pas Motor': 6,
+        'Pas Mobil': 6,
+        'Kurangi Motor': 0,
+        'Kurangi Mobil': 0,
+        'Pause Motor': 0,
+        'Pause Mobil': 0,
+        'Error Motor': 0,
+        'Error Mobil': 0,
+      },
+      'outlet_id': '1',
+      'outlet_nama': 'Outlet 1',
+      'device_id': 'XaXadd',
+      'device_nama': 'Perangkat SPBU Generator'
+    };
+
+    return hasil;
+  }
+
+  Future<List> getYearReportTransaction() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      {
+        'tahun': '2023',
+        'transaksi': 1000000,
+      }
+    ];
+  }
+
+  Future<List> getMonthReportTransaction(String year) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      {
+        'bulan': 'Januari 2023',
+        'transaksi': 1000000,
+      },
+      {
+        'bulan': 'Juli 2023',
+        'transaksi': 1000000,
+      },
+      {
+        'bulan': 'Agustus 2023',
+        'transaksi': 1000000,
+      },
+      {
+        'bulan': 'September 2023',
+        'transaksi': 1000000,
+      },
+      {
+        'bulan': 'November 2023',
+        'transaksi': 1000000,
+      },
+    ];
+  }
+
+  Future<List> getDayReportTransaction(String month) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      {
+        'hari': '12 Juli 2023',
+        'transaksi': 599,
+      },
+      {
+        'hari': '13 Juli 2023',
+        'transaksi': 678,
+      },
+      {
+        'hari': '14 Juli 2023',
+        'transaksi': 456,
+      },
+      {
+        'hari': '15 Juli 2023',
+        'transaksi': 876,
+      },
+      {
+        'hari': '16 Juli 2023',
+        'transaksi': 789,
+      },
+      {
+        'hari': '17 Juli 2023',
+        'transaksi': 900,
+      },
+      {
+        'hari': '18 Juli 2023',
+        'transaksi': 1000,
+      },
+      {
+        'hari': '19 Juli 2023',
+        'transaksi': 200,
+      },
+      {
+        'hari': '20 Juli 2023',
+        'transaksi': 300,
+      },
+      {
+        'hari': '21 Juli 2023',
+        'transaksi': 400,
+      },
+    ];
+  }
+
+  Future<List> getHourReportTransaction(String day) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [
+      {
+        'jam': '12:00',
+        'transaksi': 599,
+        'outlet_nama': 'Outlet 1',
+      },
+      {
+        'jam': '13:00',
+        'transaksi': 678,
+        'outlet_nama': 'Outlet 1',
+      },
+      {
+        'jam': '23:00',
+        'transaksi': 456,
+        'outlet_nama': 'Outlet 1',
+      },
+      {
+        'jam': '23:50',
+        'transaksi': 876,
+        'outlet_nama': 'Outlet 1',
+      },
+    ];
   }
 }

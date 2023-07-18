@@ -16,11 +16,11 @@ class ManajemenPetugasPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text('Manajemen Petugas')),
+      appBar: AppBar(title: const Text('Manajemen Petugas')),
       drawer: DrawerAdmin(size: size, active: 4),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: ElevatedButton(
               onPressed: () {
                 showCupertinoDialog(
@@ -29,21 +29,21 @@ class ManajemenPetugasPage extends ConsumerWidget {
                     builder: (context) => Consumer(
                           builder: (context, ref, child) {
                             return CupertinoAlertDialog(
-                              title: Text('Kode Referral'),
+                              title: const Text('Kode Referral'),
                               content: ref.watch(futureGetKodeReferralProvider).when(
                                     data: (data) => Text(data),
-                                    error: (error, stackTrace) => Text('Gagal Ambil Data'),
-                                    loading: () => Shimmer.fromColors(child: Container(color: Colors.black, height: 18), baseColor: Colors.transparent, highlightColor: Colors.white.withOpacity(0.5)),
+                                    error: (error, stackTrace) => const Text('Gagal Ambil Data'),
+                                    loading: () => Shimmer.fromColors(baseColor: Colors.transparent, highlightColor: Colors.white.withOpacity(0.5), child: Container(color: Colors.black, height: 18)),
                                   ),
                               actions: [
-                                TextButton(onPressed: () => Share.share(ref.watch(futureGetKodeReferralProvider).asData!.value, subject: 'Kode Referral'), child: Text("Share")),
-                                TextButton(onPressed: () => pop(context), child: Text("Batal")),
+                                TextButton(onPressed: () => Share.share(ref.watch(futureGetKodeReferralProvider).asData!.value, subject: 'Kode Referral'), child: const Text("Share")),
+                                TextButton(onPressed: () => pop(context), child: const Text("Batal")),
                               ],
                             );
                           },
                         ));
               },
-              child: Text('Kode Referral'))),
+              child: const Text('Kode Referral'))),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(futureGetEmployeesProvider);
@@ -73,16 +73,16 @@ class ManajemenPetugasPage extends ConsumerWidget {
             ref.watch(futureGetEmployeesProvider(search.text)).when(
                   skipLoadingOnRefresh: false,
                   data: (data) => ListView.builder(
-                      padding: EdgeInsets.all(20),
-                      physics: NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: data.length,
                       itemBuilder: (context, index) => Card(
-                          color: Color(0xffF6F6F6),
+                          color: const Color(0xffF6F6F6),
                           child: ListTile(
                             title: Text(data[index]['nama'], style: TextStyles.h2),
                             subtitle: Text(data[index]['email']),
-                            trailing: Icon(Icons.border_color),
+                            trailing: const Icon(Icons.border_color),
                             onTap: () {},
                           ))),
                   error: (error, stackTrace) => const Center(child: Text('Gagal Ambil Data')),

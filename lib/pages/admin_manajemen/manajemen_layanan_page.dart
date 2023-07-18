@@ -168,12 +168,12 @@ class ManajemenLayananPage extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) => StatefulBuilder(builder: (context, StateSetter setState) {
-        return Consumer(builder: (context, _ref, child) {
+        return Consumer(builder: (context, ref, child) {
           return Padding(
             padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom),
             child: ListView(
               // mainAxisSize: MainAxisSize.min,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               children: [
                 Text('Tambah Layanan', textAlign: TextAlign.center, style: TextStyles.h2),
@@ -190,26 +190,26 @@ class ManajemenLayananPage extends ConsumerWidget {
                       icon = index;
                     }),
                     child: AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 300),
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(color: icon == index ? Colors.blue.shade900 : Colors.transparent, borderRadius: BorderRadius.circular(5)),
                         child: CustomIcon(id: index)),
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextField(controller: name, keyboardType: TextInputType.name, decoration: InputDecoration(hintText: 'Nama Layanan')),
+                TextField(controller: name, keyboardType: TextInputType.name, decoration: const InputDecoration(hintText: 'Nama Layanan')),
                 const SizedBox(height: 20),
-                TextField(controller: harga, keyboardType: TextInputType.number, decoration: InputDecoration(hintText: 'Harga')),
+                TextField(controller: harga, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'Harga')),
                 const SizedBox(height: 20),
-                _ref.watch(futureGetKategoriesProvider).when(
+                ref.watch(futureGetKategoriesProvider).when(
                       data: (data) {
                         data.removeWhere((element) => element['id'] == '0');
                         return DropdownButtonFormField(
-                          hint: Text('Pilih Kategori'),
+                          hint: const Text('Pilih Kategori'),
                           items: data
                               .map((e) => DropdownMenuItem(
-                                    child: Text(e['nama']),
                                     value: int.parse(e['id']),
+                                    child: Text(e['nama']),
                                   ))
                               .toList(),
                           value: kategori,
@@ -225,13 +225,13 @@ class ManajemenLayananPage extends ConsumerWidget {
                           child: Container(margin: const EdgeInsets.symmetric(horizontal: 20), height: 55, color: Colors.black)),
                     ),
                 const SizedBox(height: 20),
-                _ref.watch(futureGetOutletsProvider("")).when(
+                ref.watch(futureGetOutletsProvider("")).when(
                       data: (data) => DropdownButtonFormField(
-                        hint: Text('Pilih Outlet'),
+                        hint: const Text('Pilih Outlet'),
                         items: data
                             .map((e) => DropdownMenuItem(
-                                  child: Text(e['nama']),
                                   value: int.parse(e['id']),
+                                  child: Text(e['nama']),
                                 ))
                             .toList(),
                         value: outlet,
@@ -251,12 +251,12 @@ class ManajemenLayananPage extends ConsumerWidget {
                       if (name.text.isEmpty) {
                         showCupertinoDialog(
                             context: context,
-                            builder: (context) => CupertinoAlertDialog(content: Text('Nama tidak boleh kosong'), actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))]));
+                            builder: (context) => CupertinoAlertDialog(content: const Text('Nama tidak boleh kosong'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
                         return;
                       } else if (harga.text.isEmpty) {
                         showCupertinoDialog(
                             context: context,
-                            builder: (context) => CupertinoAlertDialog(content: Text('Harga tidak boleh kosong'), actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))]));
+                            builder: (context) => CupertinoAlertDialog(content: const Text('Harga tidak boleh kosong'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
                         return;
                       }
                       showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));

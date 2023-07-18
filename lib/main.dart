@@ -2,9 +2,11 @@ import 'package:aplikasi_kasir/pages/auth/login_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
   // runApp(MyApp());
+  await initializeDateFormatting('id_ID', null);
   runApp(ProviderScope(child: MyApp()));
 }
 
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Color(0xff0E0E52),
+          backgroundColor: const Color(0xff0E0E52),
           foregroundColor: Colors.white,
           splashColor: Colors.white.withOpacity(0.5),
         ),
@@ -62,7 +64,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff0E0E52)),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const OnBoardingPage(),
     );
   }
 }
