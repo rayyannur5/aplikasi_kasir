@@ -3,7 +3,6 @@ import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_tra
 import 'package:aplikasi_kasir/utils/formatter.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/utils/textstyles.dart';
-import 'package:aplikasi_kasir/widgets/admin_drawer.dart';
 import 'package:aplikasi_kasir/widgets/custom_chart_with_label.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,9 +14,9 @@ class AdminLaporanTransaksiBulanPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    var size = MediaQuery.of(context).size;
+    // var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text("Ringkasan Transaksi")),
+      appBar: AppBar(title: const Text("Ringkasan Transaksi")),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(futureMonthGetTransactionProvider);
@@ -26,18 +25,18 @@ class AdminLaporanTransaksiBulanPage extends ConsumerWidget {
               skipLoadingOnRefresh: false,
               data: (data) {
                 List<Map> dataGrafik = [];
-                data.forEach((element) {
+                for (var element in data) {
                   dataGrafik.add({
                     'label': element['bulan'],
                     'value': element['transaksi'],
                   });
-                });
+                }
                 return ListView(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   children: [
                     CustomChartWithLabel(data: dataGrafik),
                     ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: data.length,
                       itemBuilder: (context, index) => Card(
@@ -45,7 +44,7 @@ class AdminLaporanTransaksiBulanPage extends ConsumerWidget {
                           title: Text(data[index]['bulan'], style: TextStyles.h2),
                           subtitle: Text("${numberFormat.format(data[index]['transaksi'])} Transaksi"),
                           onTap: () => Future.delayed(
-                              Duration(milliseconds: 200),
+                              const Duration(milliseconds: 200),
                               () => push(
                                   context,
                                   AdminLaporanTransaksiHariPage(

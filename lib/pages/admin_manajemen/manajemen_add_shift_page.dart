@@ -99,12 +99,14 @@ class _AddShiftPageState extends State<AddShiftPage> {
                     return;
                   }
                   await Future.delayed(const Duration(milliseconds: 200));
+                  // ignore: use_build_context_synchronously
                   showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
                   if (widget.id == '0') {
-                    var resp = await Services.addShift(nama.text, start!.format(context), end!.format(context));
+                    await Services.addShift(nama.text, start!.format(context), end!.format(context));
                   } else {
-                    var resp = await Services.updateShift(nama.text, start!.format(context), end!.format(context));
+                    await Services.updateShift(nama.text, start!.format(context), end!.format(context));
                   }
+                  // ignore: use_build_context_synchronously
                   pushAndRemoveUntil(context, const ManajemenShiftPage());
                 },
                 child: Text(widget.id == '0' ? 'Tambah' : 'Simpan')),

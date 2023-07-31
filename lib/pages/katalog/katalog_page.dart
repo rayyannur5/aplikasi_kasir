@@ -1,9 +1,11 @@
+import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/api/providers.dart';
 import 'package:aplikasi_kasir/pages/katalog/pembayaran_page.dart';
 import 'package:aplikasi_kasir/utils/formatter.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/utils/textstyles.dart';
 import 'package:aplikasi_kasir/widgets/admin_drawer.dart';
+import 'package:aplikasi_kasir/widgets/petugas_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
@@ -26,7 +28,13 @@ class KatalogPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Katalog')),
-      drawer: DrawerAdmin(size: size, active: 2),
+      drawer: FutureBuilder<Map>(
+          future: Local.getUserData(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) return const SizedBox();
+            if (snapshot.data!['user_role'] == 'admin') return DrawerAdmin(size: size, active: 2);
+            return DrawerPetugas(size: size, active: 1);
+          }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AnimatedOpacity(
         duration: const Duration(milliseconds: 300),

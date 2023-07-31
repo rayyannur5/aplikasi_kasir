@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/api/services.dart';
 import 'package:aplikasi_kasir/pages/auth/register_page.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
+import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/utils/textstyles.dart';
 import 'package:flutter/cupertino.dart';
@@ -93,7 +95,12 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(context: context, barrierDismissible: false, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
     bool response = await Services.login(email.text, password.text);
     if (response) {
-      pushAndRemoveUntil(context, const DashboardPage());
+      var user = await Local.getUserData();
+      if (user['user_role'] == 'admin') {
+        pushAndRemoveUntil(context, const DashboardPage());
+      } else {
+        pushAndRemoveUntil(context, KatalogPage());
+      }
     } else {
       pop(context);
       showDialog(context: context, builder: (context) => Dialog(child: Padding(padding: const EdgeInsets.all(30), child: Text('Login Gagal', textAlign: TextAlign.center, style: TextStyles.pBold))));

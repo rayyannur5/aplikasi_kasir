@@ -16,7 +16,7 @@ class AdminLaporanTransaksiPage extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text("Ringkasan Transaksi")),
+      appBar: AppBar(title: const Text("Ringkasan Transaksi")),
       drawer: DrawerAdmin(active: 9, size: size),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -25,13 +25,13 @@ class AdminLaporanTransaksiPage extends ConsumerWidget {
         child: ref.watch(futureYearGetTransactionProvider).when(
               skipLoadingOnRefresh: false,
               data: (data) => ListView.builder(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 itemCount: data.length,
                 itemBuilder: (context, index) => Card(
                   child: ListTile(
                     title: Text(data[index]['tahun'], style: TextStyles.h2),
                     subtitle: Text("${numberFormat.format(data[index]['transaksi'])} Transaksi"),
-                    onTap: () => Future.delayed(Duration(milliseconds: 200), () => push(context, AdminLaporanTransaksiBulanPage(year: data[index]['tahun']))),
+                    onTap: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, AdminLaporanTransaksiBulanPage(year: data[index]['tahun']))),
                   ),
                 ),
               ),

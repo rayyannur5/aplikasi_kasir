@@ -1,5 +1,5 @@
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
-import 'package:aplikasi_kasir/pages/petugas_laporan/laporan_transaksi_detail_page.dart';
+import 'package:aplikasi_kasir/pages/print_page/detail_transaksi_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -19,7 +19,7 @@ class SuksesPembayaranPage extends StatelessWidget {
             LottieBuilder.asset('assets/lotties/success.json'),
             const Spacer(),
             ElevatedButton(
-                onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, const LaporanTransaksiDetailPage(id: '1'))),
+                onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, const DeetailTransaksi(id: '1'))),
                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff449DD1))),
                 child: const Text('Cetak')),
             const SizedBox(height: 10),

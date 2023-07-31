@@ -14,8 +14,8 @@ class ScanQRPage extends StatelessWidget {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      floatingActionButton:
-          FloatingActionButton(onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), backgroundColor: Colors.red, foregroundColor: Colors.white, child: const Icon(Icons.close)),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), backgroundColor: Colors.red, foregroundColor: Colors.white, child: const Icon(Icons.close)),
       body: Stack(
         children: [
           MobileScanner(
@@ -25,14 +25,15 @@ class ScanQRPage extends StatelessWidget {
               // final Uint8List? image = capture.image;
               cameraController.stop();
               showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
-              var resp = await Services.checkDevice(barcodes.first.rawValue);
+              var resp = await Services().checkDevice(barcodes.first.rawValue);
               if (resp != null) {
                 pop(context);
                 pushReplacement(context, AddOutletPage(dataDevice: resp));
               } else {
                 pop(context);
                 await showCupertinoDialog(
-                    context: context, builder: (context) => CupertinoAlertDialog(content: const Text('Device Tidak Valid'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(content: const Text('Device Tidak Valid'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
                 cameraController.start();
               }
             },

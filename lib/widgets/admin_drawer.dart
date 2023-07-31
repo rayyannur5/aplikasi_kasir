@@ -1,11 +1,15 @@
+import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_ai_device_page.dart';
+import 'package:aplikasi_kasir/pages/admin_laporan/laporan_perbandingan_page.dart';
+import 'package:aplikasi_kasir/pages/admin_laporan/laporan_petugas/laporan_petugas_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_year_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_layanan_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_outlet_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_petugas_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_shift_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
+import 'package:aplikasi_kasir/pages/auth/profil_pengguna_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
@@ -45,20 +49,26 @@ class DrawerAdmin extends StatelessWidget {
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset('assets/images/logo.png', scale: 1.5),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Rayyan Nur Fauzan',
-                    style: TextStyles.h2Light,
-                  ),
-                  Text(
-                    'rayyannur5@gmail.com',
-                    style: TextStyles.pLight,
-                  ),
-                ],
-              ),
+              FutureBuilder<Map>(
+                  future: Local.getUserData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) return const SizedBox();
+                    var data = snapshot.data!;
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data['user_name'],
+                          style: TextStyles.h2Light,
+                        ),
+                        Text(
+                          data['user_email'],
+                          style: TextStyles.pLight,
+                        ),
+                      ],
+                    );
+                  }),
               const Spacer(),
               IconButton(onPressed: () {}, icon: const Icon(Icons.navigate_next, color: Colors.white)),
             ],
@@ -119,22 +129,22 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 8 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Ringkasan AI Device', style: TextStyles.pLight),
-                onTap: () => navigate(context, 8, LaporanAIDevicePage()),
+                onTap: () => navigate(context, 8, const LaporanAIDevicePage()),
               ),
               ListTile(
                 tileColor: active == 9 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Ringkasan Transaksi Penjualan', style: TextStyles.pLight),
-                onTap: () => navigate(context, 9, AdminLaporanTransaksiPage()),
+                onTap: () => navigate(context, 9, const AdminLaporanTransaksiPage()),
               ),
               ListTile(
                 tileColor: active == 10 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Laporan Perbandingan', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 10, const LaporanPerbandinganPage()),
               ),
               ListTile(
                 tileColor: active == 11 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Laporan Petugas', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 11, const LaporanPetugasPage()),
               ),
             ],
           ),
@@ -142,7 +152,7 @@ class DrawerAdmin extends StatelessWidget {
             tileColor: active == 12 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.account_circle_outlined, color: Colors.white),
             title: Text('Profil Pengguna', style: TextStyles.pBoldLight),
-            onTap: () {},
+            onTap: () => navigate(context, 12, const ProfilPenggunaPage()),
           ),
           ListTile(
             tileColor: active == 13 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -156,7 +166,16 @@ class DrawerAdmin extends StatelessWidget {
                   title: const Text('Logout'),
                   content: const Text('Apakah anda yakin untuk logout?'),
                   actions: [
-                    TextButton(onPressed: () => pushAndRemoveUntil(context, const OnBoardingPage()), child: const Text('Logout')),
+                    TextButton(
+                        onPressed: () async {
+                          var resp = await Local.userLogout();
+                          if (resp) {
+                            pushAndRemoveUntil(context, const OnBoardingPage());
+                          } else {
+                            pop(context);
+                          }
+                        },
+                        child: const Text('Logout')),
                     TextButton(onPressed: () => pop(context), child: const Text('Batal'))
                   ],
                 ),

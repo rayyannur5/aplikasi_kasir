@@ -2,12 +2,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class CustomChartWithLabel extends StatelessWidget {
-  CustomChartWithLabel({super.key, required this.data}) {
+class CustomChart2LinesWithLabel extends StatelessWidget {
+  CustomChart2LinesWithLabel({super.key, required this.data}) {
     List<Map<dynamic, dynamic>> dataTemp = [
       {
         'label': '',
-        'value': 0,
+        'value1': 0,
+        'value2': 0,
       },
     ];
     for (var element in data) {
@@ -20,30 +21,36 @@ class CustomChartWithLabel extends StatelessWidget {
   double datamax() {
     double maks = 0;
     for (var element in data) {
-      if (element['value'] > maks) {
-        maks = element['value'].toDouble();
+      if (element['value1'] > maks) {
+        maks = element['value1'].toDouble();
+      }
+      if (element['value2'] > maks) {
+        maks = element['value2'].toDouble();
       }
     }
     return maks;
   }
 
-  double bottomHeight() {
-    double maks = 0;
-    for (var element in data) {
-      if (element['label'].length > maks) {
-        maks = element['label'].length.toDouble();
-      }
-    }
-    return maks * 5;
-  }
-
-  List points() {
+  List firstpoints() {
     int i = 0;
     List temp = [];
     for (var element in data) {
       temp.add({
         'x': i.toDouble(),
-        'y': element['value'].toDouble(),
+        'y': element['value1'].toDouble(),
+      });
+      i++;
+    }
+    return temp;
+  }
+
+  List secondpoints() {
+    int i = 0;
+    List temp = [];
+    for (var element in data) {
+      temp.add({
+        'x': i.toDouble(),
+        'y': element['value2'].toDouble(),
       });
       i++;
     }
@@ -61,7 +68,7 @@ class CustomChartWithLabel extends StatelessWidget {
             minY: 0,
             maxY: datamax(),
             borderData: FlBorderData(border: const Border(left: BorderSide(), bottom: BorderSide())),
-            gridData: const FlGridData(show: false),
+            // gridData: const FlGridData(show: false),
             titlesData: FlTitlesData(
                 topTitles: const AxisTitles(),
                 leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) => Text(value.toInt().toString(), style: const TextStyle(fontSize: 9)))),
@@ -70,7 +77,7 @@ class CustomChartWithLabel extends StatelessWidget {
                     sideTitles: SideTitles(
                         showTitles: true,
                         interval: 1,
-                        reservedSize: bottomHeight(),
+                        reservedSize: 90,
                         getTitlesWidget: (value, meta) {
                           if (value >= data.length) {
                             return const SizedBox();
@@ -81,7 +88,7 @@ class CustomChartWithLabel extends StatelessWidget {
                               // alignment: Alignment.topLeft,
                               angle: -3.14 / 3,
                               child: SizedBox(
-                                width: bottomHeight() + 10,
+                                width: 110,
                                 // color: Colors.red,
                                 child: Text(
                                   data[value.toInt()]['label'].toString(),
@@ -94,10 +101,18 @@ class CustomChartWithLabel extends StatelessWidget {
                         }))),
             lineBarsData: [
               LineChartBarData(
-                spots: points().map((e) => FlSpot(e['x'], e['y'])).toList(),
+                  spots: firstpoints().map((e) => FlSpot(e['x'], e['y'])).toList(),
+                  // isCurved: true,
+                  dotData: const FlDotData(show: false),
+                  color: Theme.of(context).primaryColor
+                  // belowBarData: BarAreaData(show: true, color: Theme.of(context).primaryColor),
+                  ),
+              LineChartBarData(
+                spots: secondpoints().map((e) => FlSpot(e['x'], e['y'])).toList(),
                 // isCurved: true,
                 dotData: const FlDotData(show: false),
-                belowBarData: BarAreaData(show: true, gradient: const LinearGradient(colors: [Colors.blue, Colors.white], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+                color: const Color(0xff159600),
+                // belowBarData: BarAreaData(show: true, color: Color(0xff159600)),
               ),
             ]),
       ),

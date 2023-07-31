@@ -1,11 +1,19 @@
+import 'package:aplikasi_kasir/pages/petugas_absensi/petugas_absensi_page.dart';
+import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_absensi_page.dart';
+import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_penjualan_page.dart';
+import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_setoran_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../api/local.dart';
+import '../pages/auth/onboarding_page.dart';
+import '../pages/auth/profil_pengguna_page.dart';
+import '../pages/katalog/katalog_page.dart';
 import '../utils/navigator.dart';
 import '../utils/textstyles.dart';
 
-class PetugasDrawer extends StatelessWidget {
-  const PetugasDrawer({
+class DrawerPetugas extends StatelessWidget {
+  const DrawerPetugas({
     super.key,
     required this.size,
     required this.active,
@@ -36,35 +44,41 @@ class PetugasDrawer extends StatelessWidget {
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset('assets/images/logo.png', scale: 1.5),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Rayyan Nur Fauzan',
-                    style: TextStyles.h2Light,
-                  ),
-                  Text(
-                    'rayyannur5@gmail.com',
-                    style: TextStyles.pLight,
-                  ),
-                ],
-              ),
+              FutureBuilder<Map>(
+                  future: Local.getUserData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) return const SizedBox();
+                    var data = snapshot.data!;
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data['user_nama'],
+                          style: TextStyles.h2Light,
+                        ),
+                        Text(
+                          data['user_email'],
+                          style: TextStyles.pLight,
+                        ),
+                      ],
+                    );
+                  }),
               const Spacer(),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.navigate_next, color: Colors.white)),
+              IconButton(onPressed: () => navigate(context, 6, const ProfilPenggunaPage()), icon: const Icon(Icons.navigate_next, color: Colors.white)),
             ],
           )),
           ListTile(
             tileColor: active == 1 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.local_mall_outlined, color: Colors.white),
             title: Text('Katalog', style: TextStyles.pBoldLight),
-            onTap: () {},
+            onTap: () => navigate(context, 1, KatalogPage()),
           ),
           ListTile(
             tileColor: active == 2 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.qr_code_scanner, color: Colors.white),
             title: Text('Absensi', style: TextStyles.pBoldLight),
-            onTap: () {},
+            onTap: () => navigate(context, 2, const PetugasAbsensiPage()),
           ),
           ExpansionTile(
             collapsedBackgroundColor: active >= 3 && active <= 5 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -76,17 +90,17 @@ class PetugasDrawer extends StatelessWidget {
               ListTile(
                 tileColor: active == 3 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Laporan Penjualan', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 3, PetugasLaporanPenjualanPage()),
               ),
               ListTile(
                 tileColor: active == 4 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Laporan Absensi', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 4, PetugasLaporanAbsensiPage()),
               ),
               ListTile(
                 tileColor: active == 5 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Laporan Setoran', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 5, PetugasLaporanSetoranPage()),
               ),
             ],
           ),
@@ -94,7 +108,7 @@ class PetugasDrawer extends StatelessWidget {
             tileColor: active == 6 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.account_circle_outlined, color: Colors.white),
             title: Text('Profil Pengguna', style: TextStyles.pBoldLight),
-            onTap: () {},
+            onTap: () => navigate(context, 6, const ProfilPenggunaPage()),
           ),
           ListTile(
             tileColor: active == 7 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -104,7 +118,23 @@ class PetugasDrawer extends StatelessWidget {
               pop(context);
               showCupertinoDialog(
                 context: context,
-                builder: (context) => AlertDialog(actions: [TextButton(onPressed: () {}, child: const Text('Logout')), TextButton(onPressed: () {}, child: const Text('Batal'))]),
+                builder: (context) => CupertinoAlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Apakah anda yakin untuk logout?'),
+                  actions: [
+                    TextButton(
+                        onPressed: () async {
+                          var resp = await Local.userLogout();
+                          if (resp) {
+                            pushAndRemoveUntil(context, const OnBoardingPage());
+                          } else {
+                            pop(context);
+                          }
+                        },
+                        child: const Text('Logout')),
+                    TextButton(onPressed: () => pop(context), child: const Text('Batal'))
+                  ],
+                ),
               );
             },
           ),

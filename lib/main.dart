@@ -1,4 +1,3 @@
-import 'package:aplikasi_kasir/pages/auth/login_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
