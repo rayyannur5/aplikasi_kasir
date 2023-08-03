@@ -9,7 +9,7 @@ class Services {
   final String baseUrl = "https://fit-vaguely-sloth.ngrok-free.app/aplikasi_kasir";
   final dio = Dio(
     BaseOptions(
-      baseUrl: 'https://fit-vaguely-sloth.ngrok-free.app/aplikasi_kasir',
+      baseUrl: 'https://fit-vaguely-sloth.ngrok-free.app/server_aplikasi_kasir',
     ),
   );
 
