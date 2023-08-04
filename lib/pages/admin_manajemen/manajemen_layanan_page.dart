@@ -1,5 +1,4 @@
 import 'package:aplikasi_kasir/api/services.dart';
-import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_kategori_layanan_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,50 +20,26 @@ class ManajemenLayananPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
-    int selectedKategori = ref.watch(selectedKategoriProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Manajemen Layanan')),
       drawer: DrawerAdmin(size: size, active: 3),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: SizedBox(
-        height: 100,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: size.width - (size.width / 3),
-              child: Card(
-                elevation: 10,
-                color: Theme.of(context).primaryColor,
-                child: ListTile(
-                  title: Text('Kategori', textAlign: TextAlign.center, style: TextStyles.h2Light),
-                  titleAlignment: ListTileTitleAlignment.center,
-                  onTap: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, const KategoriLayananPage())),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            FloatingActionButton(
-                backgroundColor: const Color(0xff449DD1),
-                foregroundColor: Colors.white,
-                onPressed: () async {
-                  await Future.delayed(const Duration(milliseconds: 200));
-                  var name = TextEditingController();
-                  var harga = TextEditingController();
-                  int icon = 0;
+      floatingActionButton: FloatingActionButton(
+          backgroundColor: const Color(0xff449DD1),
+          foregroundColor: Colors.white,
+          onPressed: () async {
+            await Future.delayed(const Duration(milliseconds: 200));
+            var name = TextEditingController();
+            var harga = TextEditingController();
+            int icon = 0;
 
-                  modalItemManajemen(ref, context, icon, name, harga, null, null);
-                },
-                child: const Icon(Icons.add)),
-          ],
-        ),
-      ),
+            // ignore: use_build_context_synchronously
+            modalItemManajemen(ref, context, icon, name, harga, null, null);
+          },
+          child: const Icon(Icons.add)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(futureGetItemsProvider);
-          ref.invalidate(selectedKategoriProvider);
-          ref.invalidate(futureGetKategoriesProvider);
         },
         child: ListView(
           children: [
@@ -84,44 +59,14 @@ class ManajemenLayananPage extends ConsumerWidget {
                 ],
               ),
             ),
-            ref.watch(futureGetKategoriesProvider).when(
-                  skipLoadingOnRefresh: false,
-                  data: (kategories) {
-                    if (kategories.where((element) => element['id'] == '0').toList().isEmpty) {
-                      kategories.add({
-                        'id': '0',
-                        'nama': 'Semua Layanan',
-                      });
-                    }
-                    return DropdownButtonFormField(
-                      value: kategories.last,
-                      items: kategories.map((e) => DropdownMenuItem(value: e, child: Text(e['nama']))).toList(),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      borderRadius: BorderRadius.circular(10),
-                      onChanged: (value) {
-                        search.text = "";
-                        ref.read(selectedKategoriProvider.notifier).state = int.parse(value!['id']);
-                      },
-                    );
-                  },
-                  error: (error, stackTrace) => Container(height: 55, color: Colors.grey, child: const Center(child: Text('Gagal Ambil Data'))),
-                  loading: () => Shimmer.fromColors(
-                      baseColor: Colors.transparent,
-                      highlightColor: Colors.white.withOpacity(0.5),
-                      child: Container(margin: const EdgeInsets.symmetric(horizontal: 20), height: 55, color: Colors.black)),
-                ),
             ref.watch(futureGetItemsProvider(1)).when(
                   skipLoadingOnRefresh: false,
                   data: (items) {
                     List showItems;
-                    if (selectedKategori == 0) {
-                      if (search.text.isNotEmpty) {
-                        showItems = items.where((element) => element['nama'].toString().toLowerCase().contains(search.text.toLowerCase())).toList();
-                      } else {
-                        showItems = items;
-                      }
+                    if (search.text.isNotEmpty) {
+                      showItems = items.where((element) => element['nama'].toString().toLowerCase().contains(search.text.toLowerCase())).toList();
                     } else {
-                      showItems = items.where((element) => element['kategori'] == selectedKategori.toString()).toList();
+                      showItems = items;
                     }
 
                     return ListView.builder(
@@ -201,31 +146,7 @@ class ManajemenLayananPage extends ConsumerWidget {
                 const SizedBox(height: 20),
                 TextField(controller: harga, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'Harga')),
                 const SizedBox(height: 20),
-                ref.watch(futureGetKategoriesProvider).when(
-                      data: (data) {
-                        data.removeWhere((element) => element['id'] == '0');
-                        return DropdownButtonFormField(
-                          hint: const Text('Pilih Kategori'),
-                          items: data
-                              .map((e) => DropdownMenuItem(
-                                    value: int.parse(e['id']),
-                                    child: Text(e['nama']),
-                                  ))
-                              .toList(),
-                          value: kategori,
-                          onChanged: (value) => setState(() {
-                            kategori = value;
-                          }),
-                        );
-                      },
-                      error: (error, stackTrace) => const Center(child: Text('Gagal Ambil Data')),
-                      loading: () => Shimmer.fromColors(
-                          baseColor: Colors.transparent,
-                          highlightColor: Colors.white.withOpacity(0.5),
-                          child: Container(margin: const EdgeInsets.symmetric(horizontal: 20), height: 55, color: Colors.black)),
-                    ),
-                const SizedBox(height: 20),
-                ref.watch(futureGetOutletsProvider("")).when(
+                ref.watch(futureGetOutletsProvider(1)).when(
                       data: (data) => DropdownButtonFormField(
                         hint: const Text('Pilih Outlet'),
                         items: data

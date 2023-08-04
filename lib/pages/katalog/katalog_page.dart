@@ -23,8 +23,6 @@ class KatalogPage extends ConsumerWidget {
     List countItem = ref.watch(countItemProvider);
     var size = MediaQuery.of(context).size;
     int price = ref.watch(priceProvider);
-    int selectedKategori = ref.watch(selectedKategoriProvider);
-    // var selectedKategori = ref.watch(selectedKategoriProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Katalog')),
@@ -71,8 +69,7 @@ class KatalogPage extends ConsumerWidget {
           ref.invalidate(futureGetItemsProvider);
           ref.invalidate(countItemProvider);
           ref.invalidate(priceProvider);
-          ref.invalidate(selectedKategoriProvider);
-          ref.invalidate(futureGetKategoriesProvider);
+          ref.invalidate(futureGetOutletsProvider);
         },
         child: ListView(
           children: [
@@ -92,23 +89,16 @@ class KatalogPage extends ConsumerWidget {
                 ],
               ),
             ),
-            ref.watch(futureGetKategoriesProvider).when(
+            ref.watch(futureGetOutletsProvider(1)).when(
                   skipLoadingOnRefresh: false,
-                  data: (kategories) {
-                    if (kategories.where((element) => element['id'] == '0').toList().isEmpty) {
-                      kategories.add({
-                        'id': '0',
-                        'nama': 'Semua Layanan',
-                      });
-                    }
+                  data: (data) {
                     return DropdownButtonFormField(
-                      value: kategories.last,
-                      items: kategories.map((e) => DropdownMenuItem(value: e, child: Text(e['nama']))).toList(),
+                      value: data.first,
+                      items: data.map((e) => DropdownMenuItem(value: e, child: Text(e['nama']))).toList(),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       borderRadius: BorderRadius.circular(10),
                       onChanged: (value) {
                         search.text = "";
-                        ref.read(selectedKategoriProvider.notifier).state = int.parse(value!['id']);
                       },
                     );
                   },
@@ -132,14 +122,11 @@ class KatalogPage extends ConsumerWidget {
                     }
 
                     List showItems;
-                    if (selectedKategori == 0) {
-                      if (search.text.isNotEmpty) {
-                        showItems = items.where((element) => element['nama'].toString().toLowerCase().contains(search.text.toLowerCase())).toList();
-                      } else {
-                        showItems = items;
-                      }
+
+                    if (search.text.isNotEmpty) {
+                      showItems = items.where((element) => element['nama'].toString().toLowerCase().contains(search.text.toLowerCase())).toList();
                     } else {
-                      showItems = items.where((element) => element['kategori'] == selectedKategori.toString()).toList();
+                      showItems = items;
                     }
 
                     return ListView.builder(

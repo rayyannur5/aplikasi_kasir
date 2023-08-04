@@ -51,7 +51,7 @@ class ManajemenOutletPage extends ConsumerWidget {
                 ],
               ),
             ),
-            ref.watch(futureGetOutletsProvider(search.text)).when(
+            ref.watch(futureGetOutletsProvider(1)).when(
                   skipLoadingOnRefresh: false,
                   data: (data) => ListView.builder(
                       padding: const EdgeInsets.all(20),

@@ -6,18 +6,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-class AddShiftPage extends StatefulWidget {
-  const AddShiftPage({super.key, this.id = '0', required this.nama, required this.start, required this.end});
+class EditShiftPage extends StatefulWidget {
+  const EditShiftPage({super.key, this.id = '0', required this.nama, required this.start, required this.end});
   final String id;
   final String start;
   final String end;
   final String nama;
 
   @override
-  State<AddShiftPage> createState() => _AddShiftPageState();
+  State<EditShiftPage> createState() => _EditShiftPageState();
 }
 
-class _AddShiftPageState extends State<AddShiftPage> {
+class _EditShiftPageState extends State<EditShiftPage> {
   TimeOfDay? start;
   TimeOfDay? end;
   TextEditingController nama = TextEditingController();

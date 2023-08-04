@@ -1,5 +1,5 @@
 import 'package:aplikasi_kasir/api/providers.dart';
-import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_add_shift_page.dart';
+import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_edit_shift_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/widgets/admin_drawer.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +17,6 @@ class ManajemenShiftPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Manajemen Shift')),
       drawer: DrawerAdmin(active: 7, size: size),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, const AddShiftPage(nama: '', start: '00:00', end: '23:59', id: '0'))), child: const Icon(Icons.add)),
       body: ref.watch(futureGetShiftProvider).when(
             skipLoadingOnRefresh: false,
             data: (data) => RefreshIndicator(
@@ -34,8 +32,8 @@ class ManajemenShiftPage extends ConsumerWidget {
                         title: Text(data[index]['nama'], style: TextStyles.h2),
                         subtitle: Text("${data[index]['start']} - ${data[index]['end']}"),
                         trailing: const Icon(Icons.border_color),
-                        onTap: () => Future.delayed(
-                            const Duration(milliseconds: 200), () => push(context, AddShiftPage(nama: data[index]['nama'], start: data[index]['start'], end: data[index]['end'], id: data[index]['id']))),
+                        onTap: () => Future.delayed(const Duration(milliseconds: 200),
+                            () => push(context, EditShiftPage(nama: data[index]['nama'], start: data[index]['start'], end: data[index]['end'], id: data[index]['id']))),
                       ))),
             ),
             error: (error, stackTrace) => const Center(child: Text('Gagal Ambil Data')),

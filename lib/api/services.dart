@@ -283,7 +283,7 @@ class Services {
     return "Axd679";
   }
 
-  Future<List<Map>> getOutlets(String keyword) async {
+  Future<List<Map>> getOutlets(int id) async {
     await Future.delayed(const Duration(seconds: 1));
 
     List<Map> hasil = [
@@ -315,13 +315,6 @@ class Services {
             'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
       },
     ];
-
-    hasil = hasil
-        .where((element) => element['nama']
-            .toString()
-            .toLowerCase()
-            .contains(keyword.toLowerCase()))
-        .toList();
 
     return hasil;
   }

@@ -8,7 +8,6 @@ import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/utils/textstyles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 

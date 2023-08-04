@@ -29,7 +29,7 @@ class LaporanPerbandinganPage extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            ref.watch(futureGetOutletsProvider("")).when(
+            ref.watch(futureGetOutletsProvider(1)).when(
                   data: (data) => DropdownButtonFormField(
                       items: data.map((e) => DropdownMenuItem(value: e, child: Text(e['nama']))).toList(),
                       value: data.first,

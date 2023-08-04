@@ -106,7 +106,7 @@ class CreateAbsensiPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: FutureBuilder<List<Map>>(
-          future: Services().getOutlets(""),
+          future: Services().getOutlets(1),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) return Shimmer.fromColors(baseColor: Colors.transparent, highlightColor: Colors.white.withOpacity(0.5), child: const TextField());
             selectedOutlet = snapshot.data!.first;

@@ -17,8 +17,6 @@ class PembayaranPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
-    int selectedKategori = ref.watch(selectedKategoriProvider);
-    print(selectedKategori);
     ref.watch(futureGetItemsProvider(1).selectAsync((data) {
       print(data);
       return items = data;
@@ -296,8 +294,6 @@ class PembayaranPage extends ConsumerWidget {
                       ref.invalidate(futureGetItemsProvider);
                       ref.invalidate(countItemProvider);
                       ref.invalidate(priceProvider);
-                      ref.invalidate(selectedKategoriProvider);
-                      ref.invalidate(futureGetKategoriesProvider);
                       pushAndRemoveUntil(context, const SuksesPembayaranPage());
                     }
                   },
