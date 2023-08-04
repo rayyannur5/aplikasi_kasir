@@ -23,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   bool headervisible = false;
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   _LoginPageState() {
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -30,6 +31,13 @@ class _LoginPageState extends State<LoginPage> {
         headervisible = true;
       });
     });
+  }
+
+
+  bool isEmail(String em) {
+    RegExp regExp = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+
+    return regExp.hasMatch(em);
   }
   @override
   Widget build(BuildContext context) {
@@ -50,61 +58,70 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Container form(Size size) {
-    return Container(
-      padding: const EdgeInsets.all(30),
-      width: double.infinity,
-      height: size.height - 300,
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40))),
-      child: Column(
-        children: [
-          Text('Masukkan email dan password', style: TextStyles.h3),
-          const SizedBox(height: 30),
-          TextField(controller: email, decoration: const InputDecoration(labelText: 'Email')),
-          const SizedBox(height: 20),
-          TextField(controller: password, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
-          const SizedBox(height: 50),
-          ElevatedButton(
-              onPressed: () {
-                Future.delayed(const Duration(milliseconds: 200), login);
-              },
-              child: const Text('Login')),
-          const Spacer(),
-          TextButton(
-              onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pushReplacementFromBottom(context, const RegisterPage())),
-              child: Text('Apakah Belum Punya Akun ? Daftar', style: TextStyles.pBold)),
-        ],
+  Form form(Size size) {
+    return Form(
+      key: _formKey,
+      child: Container(
+        padding: const EdgeInsets.all(30),
+        width: double.infinity,
+        height: size.height - 300,
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40))),
+        child: Column(
+          children: [
+            Text('Masukkan email dan password', style: TextStyles.h3),
+            const SizedBox(height: 30),
+            TextFormField(controller: email, validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Kolom tidak boleh kosong";
+                  } else if (!isEmail(value)) {
+                    return "Email tidak valid";
+                  } else {
+                    return null;
+                  }
+                }, decoration: const InputDecoration(labelText: 'Email')),
+            const SizedBox(height: 20),
+            TextFormField(controller: password, validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Kolom tidak boleh kosong";
+                  } else if (value.length < 4) {
+                    return "Banyak karakter password kurang dari 4";
+                  } else {
+                    return null;
+                  }
+                }, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
+            const SizedBox(height: 50),
+            ElevatedButton(
+                onPressed: () {
+                  Future.delayed(const Duration(milliseconds: 200), login);
+                },
+                child: const Text('Login')),
+            const Spacer(),
+            TextButton(
+                onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pushReplacementFromBottom(context, const RegisterPage())),
+                child: Text('Apakah Belum Punya Akun ? Daftar', style: TextStyles.pBold)),
+          ],
+        ),
       ),
     );
   }
 
   login() async {
-    if (email.text.isEmpty) {
-      showCupertinoDialog(
-          barrierDismissible: true,
-          context: context,
-          builder: (context) => CupertinoAlertDialog(content: const Text('Kolom Email Harus Diisi'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
-      return;
-    } else if (password.text.isEmpty) {
-      showCupertinoDialog(
-          barrierDismissible: true,
-          context: context,
-          builder: (context) => CupertinoAlertDialog(content: const Text('Kolom Password Harus Diisi'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
-      return;
-    }
+    if(_formKey.currentState!.validate()){
+
     showDialog(context: context, barrierDismissible: false, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
-    bool response = await Services.login(email.text, password.text);
-    if (response) {
-      var user = await Local.getUserData();
-      if (user['user_role'] == 'admin') {
+    Map response = await Services.login(email.text, password.text);
+    if (response['success']) {
+      var userData = await Local.getUserData();
+      if (userData['user_role'] == 'admin') {
         pushAndRemoveUntil(context, const DashboardPage());
       } else {
         pushAndRemoveUntil(context, KatalogPage());
       }
     } else {
       pop(context);
-      showDialog(context: context, builder: (context) => Dialog(child: Padding(padding: const EdgeInsets.all(30), child: Text('Login Gagal', textAlign: TextAlign.center, style: TextStyles.pBold))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['errors'])));
       return;
+    }
     }
   }
 

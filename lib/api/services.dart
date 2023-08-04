@@ -6,33 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Services {
-  final String baseUrl = "https://fit-vaguely-sloth.ngrok-free.app/aplikasi_kasir";
-  final dio = Dio(
+  static final dio = Dio(
     BaseOptions(
       baseUrl: 'https://fit-vaguely-sloth.ngrok-free.app/server_aplikasi_kasir',
     ),
   );
 
   static login(email, password) async {
-    await Future.delayed(const Duration(seconds: 1));
-    if (email == 'admin@mail.com') {
-      await Local.setUserData({
-        'user_nama': 'Administrator',
-        'user_email': 'admin@mail.com',
-        'user_role': 'admin',
-        'user_phone': '6285215955155',
-      });
-      return true;
-    } else if (email == 'user@mail.com') {
-      await Local.setUserData({
-        'user_nama': 'User Biasa',
-        'user_email': 'user@mail.com',
-        'user_role': 'user',
-        'user_phone': '6285215955155',
-      });
-      return true;
+    try {
+      var resp = await dio.post(Uri.encodeFull('/auth/login.php'),
+          data: FormData.fromMap({'email': email, 'password': password}));
+      if (resp.data['success']) {
+        await Local.setUserData(resp.data['data'][0]);
+        await Local.setLogin(true);
+      }
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
     }
-    return false;
   }
 
   static Future<Map> getUserInformation() async {
@@ -69,7 +60,8 @@ class Services {
     Map<String, dynamic> registerData = await Local.getRegisterData();
     try {
       if (await Local.getRegisterMode() == 'admin') {
-        var resp = await dio.post(Uri.decodeFull('/admin/auth/register.php'), data: FormData.fromMap(registerData));
+        var resp = await dio.post(Uri.decodeFull('/admin/auth/register.php'),
+            data: FormData.fromMap(registerData));
         if (resp.data['success']) {
           await Local.setUserData(resp.data['data'][0]);
           await Local.setReceiptData(resp.data['data'][0]);
@@ -103,7 +95,8 @@ class Services {
   addOutlet() async {
     Map<String, dynamic> addOutletData = await Local.getAddOutletData();
     try {
-      var resp = await dio.post(Uri.encodeFull('/admin/stores/create.php'), data: FormData.fromMap(addOutletData));
+      var resp = await dio.post(Uri.encodeFull('/admin/stores/create.php'),
+          data: FormData.fromMap(addOutletData));
       return resp.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -227,7 +220,9 @@ class Services {
       },
     ];
 
-    hasil = hasil.where((element) => element['outlet_id'] == outletId.toString()).toList();
+    hasil = hasil
+        .where((element) => element['outlet_id'] == outletId.toString())
+        .toList();
 
     return hasil;
   }
@@ -272,7 +267,12 @@ class Services {
       },
     ];
 
-    hasil = hasil.where((element) => element['nama'].toString().toLowerCase().contains(keyword.toLowerCase())).toList();
+    hasil = hasil
+        .where((element) => element['nama']
+            .toString()
+            .toLowerCase()
+            .contains(keyword.toLowerCase()))
+        .toList();
 
     return hasil;
   }
@@ -293,7 +293,8 @@ class Services {
         'mesin_id': 'asRf2',
         'lat': '-7.316817334144685',
         'lon': '112.7254388237554',
-        'addr': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
+        'addr':
+            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
       },
       {
         'id': '2',
@@ -301,7 +302,8 @@ class Services {
         'mesin_id': 'asRf2',
         'lat': '-7.316817334144685',
         'lon': '112.7254388237554',
-        'addr': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
+        'addr':
+            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
       },
       {
         'id': '3',
@@ -309,11 +311,17 @@ class Services {
         'mesin_id': 'asRf2',
         'lat': '-7.316817334144685',
         'lon': '112.7254388237554',
-        'addr': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
+        'addr':
+            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
       },
     ];
 
-    hasil = hasil.where((element) => element['nama'].toString().toLowerCase().contains(keyword.toLowerCase())).toList();
+    hasil = hasil
+        .where((element) => element['nama']
+            .toString()
+            .toLowerCase()
+            .contains(keyword.toLowerCase()))
+        .toList();
 
     return hasil;
   }
@@ -553,10 +561,12 @@ class Services {
         'image_out': 'https://picsum.photos/200/300',
         'lat_in': '-7.31686186932247',
         'lon_in': '112.72543698655583',
-        'addr_in': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
+        'addr_in':
+            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
         'lat_out': '-7.316906755372916',
         'lon_out': '112.72549852076374',
-        'addr_out': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
+        'addr_out':
+            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
         'omset': '1000000',
         'shift': '2',
         'keterangan': 'Tepat Waktu',
@@ -566,7 +576,8 @@ class Services {
 
   Future<List> getPetugasLaporanPenjualan(DateTimeRange range) async {
     await Future.delayed(const Duration(seconds: 1));
-    if (DateFormat('y-MM-d HH:m').format(range.start) == DateFormat('y-MM-d HH:m').format(range.end)) {
+    if (DateFormat('y-MM-d HH:m').format(range.start) ==
+        DateFormat('y-MM-d HH:m').format(range.end)) {
       return [
         {
           'id': '1',

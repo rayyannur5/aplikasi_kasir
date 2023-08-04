@@ -45,10 +45,9 @@ class Local {
     };
   }
 
-  static Future setLogin(Map data) async {
+  static Future setLogin(bool data) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setBool('is_login', data['value']);
-    await pref.setBool('role', data['role']);
+    await pref.setBool('is_login', data);
   }
 
 // REGISTER LOGIN
@@ -59,6 +58,7 @@ class Local {
     await pref.setString('user_email', data['email']);
     await pref.setString('user_phone', data['phone']);
     await pref.setString('user_profile_picture', data['profile_picture']);
+    await pref.setString('user_role', data['role']);
   }
 
   static Future<Map<String, dynamic>> getUserData() async {
@@ -70,6 +70,7 @@ class Local {
       'user_email': pref.getString('user_email'),
       'user_profile_picture': pref.getString('user_profile_picture'),
       'user_phone': pref.getString('user_phone'),
+      'user_role' : pref.getString('user_role'),
     };
   }
 

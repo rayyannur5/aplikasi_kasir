@@ -54,7 +54,7 @@ class DrawerPetugas extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          data['user_nama'],
+                          data['user_name'],
                           style: TextStyles.h2Light,
                         ),
                         Text(
