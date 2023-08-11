@@ -105,21 +105,21 @@ class CreateAbsensiPage extends StatelessWidget {
   Padding pilihOutlet() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: FutureBuilder<List<Map>>(
-          future: Services().getOutlets(1),
+      child: FutureBuilder(
+          future: Services().getOutlets(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) return Shimmer.fromColors(baseColor: Colors.transparent, highlightColor: Colors.white.withOpacity(0.5), child: const TextField());
             selectedOutlet = snapshot.data!.first;
             return DropdownButtonFormField(
-              value: snapshot.data!.first,
-              items: snapshot.data!
+              value: snapshot.data['data'].first,
+              items: snapshot.data['data']
                   .map((e) => DropdownMenuItem(
                         value: e,
                         child: Text(e['nama']),
                       ))
                   .toList(),
               onChanged: (value) {
-                selectedOutlet = value;
+                selectedOutlet = value as Map;
               },
             );
           }),

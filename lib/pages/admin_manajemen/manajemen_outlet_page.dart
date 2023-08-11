@@ -51,60 +51,63 @@ class ManajemenOutletPage extends ConsumerWidget {
                 ],
               ),
             ),
-            ref.watch(futureGetOutletsProvider(1)).when(
+            ref.watch(futureGetOutletsProvider).when(
                   skipLoadingOnRefresh: false,
-                  data: (data) => ListView.builder(
-                      padding: const EdgeInsets.all(20),
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: data.length,
-                      itemBuilder: (context, index) => Card(
-                          color: const Color(0xffF6F6F6),
-                          child: ListTile(
-                            title: Text(data[index]['nama'], style: TextStyles.h2),
-                            subtitle: Text(data[index]['addr']),
-                            trailing: const Icon(Icons.border_color),
-                            onTap: () {
-                              var editOutlet = TextEditingController(text: data[index]['nama']);
-                              var lokasi = TextEditingController(text: "${data[index]['lat']}, ${data[index]['lat']}");
-                              showCupertinoDialog(
-                                  context: context,
-                                  builder: (context) => StatefulBuilder(builder: (context, setState) {
-                                        return CupertinoAlertDialog(
-                                          title: const Text('Ubah Outlet'),
-                                          content: Column(
-                                            children: [
-                                              CupertinoTextField(controller: editOutlet, placeholder: 'Ubah Outlet', decoration: BoxDecoration(color: Colors.white.withOpacity(0.4))),
-                                              const SizedBox(height: 10),
-                                              CupertinoTextField(controller: lokasi, placeholder: 'Lokasi', enabled: false, decoration: BoxDecoration(color: Colors.white.withOpacity(0.4))),
-                                              const SizedBox(height: 10),
-                                              CupertinoButton.filled(
-                                                  child: const Text('Pilih Lokasi'),
-                                                  onPressed: () async {
-                                                    GeoPoint temp = await Navigator.push(context, MaterialPageRoute(builder: (context) => const PickLoactionPage()));
-                                                    setState(() {
-                                                      lokasi.text = "${temp.latitude}, ${temp.longitude}";
-                                                    });
-                                                  }),
+                  data: (result) {
+                    List data = result['data'];
+                    return ListView.builder(
+                        padding: const EdgeInsets.all(20),
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: data.length,
+                        itemBuilder: (context, index) => Card(
+                            color: const Color(0xffF6F6F6),
+                            child: ListTile(
+                              title: Text(data[index]['name'], style: TextStyles.h2),
+                              subtitle: Text(data[index]['addr']),
+                              trailing: const Icon(Icons.border_color),
+                              onTap: () {
+                                var editOutlet = TextEditingController(text: data[index]['name']);
+                                var lokasi = TextEditingController(text: "${data[index]['lat']}, ${data[index]['lat']}");
+                                showCupertinoDialog(
+                                    context: context,
+                                    builder: (context) => StatefulBuilder(builder: (context, setState) {
+                                          return CupertinoAlertDialog(
+                                            title: const Text('Ubah Outlet'),
+                                            content: Column(
+                                              children: [
+                                                CupertinoTextField(controller: editOutlet, placeholder: 'Ubah Outlet', decoration: BoxDecoration(color: Colors.white.withOpacity(0.4))),
+                                                const SizedBox(height: 10),
+                                                CupertinoTextField(controller: lokasi, placeholder: 'Lokasi', enabled: false, decoration: BoxDecoration(color: Colors.white.withOpacity(0.4))),
+                                                const SizedBox(height: 10),
+                                                CupertinoButton.filled(
+                                                    child: const Text('Pilih Lokasi'),
+                                                    onPressed: () async {
+                                                      GeoPoint temp = await Navigator.push(context, MaterialPageRoute(builder: (context) => const PickLoactionPage()));
+                                                      setState(() {
+                                                        lokasi.text = "${temp.latitude}, ${temp.longitude}";
+                                                      });
+                                                    }),
+                                              ],
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                  onPressed: () {
+                                                    pop(context);
+                                                  },
+                                                  child: const Text('Simpan')),
+                                              TextButton(
+                                                  onPressed: () {
+                                                    pop(context);
+                                                  },
+                                                  child: const Text('Hapus')),
+                                              TextButton(onPressed: () => pop(context), child: const Text('Batal')),
                                             ],
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                                onPressed: () {
-                                                  pop(context);
-                                                },
-                                                child: const Text('Simpan')),
-                                            TextButton(
-                                                onPressed: () {
-                                                  pop(context);
-                                                },
-                                                child: const Text('Hapus')),
-                                            TextButton(onPressed: () => pop(context), child: const Text('Batal')),
-                                          ],
-                                        );
-                                      }));
-                            },
-                          ))),
+                                          );
+                                        }));
+                              },
+                            )));
+                  },
                   error: (error, stackTrace) => const Center(child: Text('Gagal Ambil Data')),
                   loading: () => Center(child: LottieBuilder.asset('assets/lotties/loading.json')),
                 ),

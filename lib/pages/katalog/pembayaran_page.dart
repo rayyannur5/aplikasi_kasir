@@ -17,9 +17,8 @@ class PembayaranPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
-    ref.watch(futureGetItemsProvider(1).selectAsync((data) {
-      print(data);
-      return items = data;
+    ref.watch(futureGetItemsProvider.selectAsync((data) {
+      return items = data['data'];
     }));
     int amount = ref.watch(amountProvider);
     int price = ref.watch(priceProvider);

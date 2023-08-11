@@ -41,7 +41,7 @@ class Local {
     SharedPreferences pref = await SharedPreferences.getInstance();
     return {
       'value': pref.getBool('is_login'),
-      'role': pref.getString('role'),
+      'role': pref.getString('user_role'),
     };
   }
 
@@ -70,7 +70,7 @@ class Local {
       'user_email': pref.getString('user_email'),
       'user_profile_picture': pref.getString('user_profile_picture'),
       'user_phone': pref.getString('user_phone'),
-      'user_role' : pref.getString('user_role'),
+      'user_role': pref.getString('user_role'),
     };
   }
 
@@ -83,6 +83,7 @@ class Local {
 
   static userLogout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
+    await setLogin(false);
     await pref.remove('user_nama');
     await pref.remove('user_email');
     await pref.remove('user_role');

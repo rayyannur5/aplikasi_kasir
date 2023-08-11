@@ -14,8 +14,7 @@ class Services {
 
   static login(email, password) async {
     try {
-      var resp = await dio.post(Uri.encodeFull('/auth/login.php'),
-          data: FormData.fromMap({'email': email, 'password': password}));
+      var resp = await dio.post(Uri.encodeFull('/auth/login.php'), data: FormData.fromMap({'email': email, 'password': password}));
       if (resp.data['success']) {
         await Local.setUserData(resp.data['data'][0]);
         await Local.setLogin(true);
@@ -41,9 +40,80 @@ class Services {
     return true;
   }
 
-  static addItems(icon, name, harga, kategori) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return true;
+  // MANAJEMEN LAYANAN
+  Future<Map> getItems() async {
+    try {
+      Map<String, dynamic> userData = await Local.getUserData();
+      var res = await dio.get(Uri.encodeFull('/admin/products/get.php'), queryParameters: {'admin_id': userData['user_id']});
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static addItems(icon, name) async {
+    try {
+      Map<String, dynamic> userData = await Local.getUserData();
+      var res = await dio.post(Uri.encodeFull("/admin/products/create.php"), data: FormData.fromMap({'admin_id': userData['user_id'], 'icon': icon, 'name': name}));
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static editItems(id, icon, name) async {
+    try {
+      var res = await dio.post(Uri.encodeFull("/admin/products/update.php/$id"), data: FormData.fromMap({'icon': icon, 'name': name}));
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static deleteItems(id) async {
+    try {
+      var res = await dio.get(Uri.encodeFull("/admin/products/delete.php/$id"));
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getOutlets() async {
+    try {
+      var userData = await Local.getUserData();
+      var res = await dio.get(Uri.encodeFull("/admin/stores/get.php"), queryParameters: {'admin_id': userData['user_id']});
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getPrices(storeId) async {
+    try {
+      var res = await dio.get(Uri.encodeFull("/admin/prices/get.php"), queryParameters: {'store_id': storeId});
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static createPrice(storeId, productId, price) async {
+    try {
+      var res = await dio.post(Uri.encodeFull("/admin/prices/create.php"), data: FormData.fromMap({'store_id': storeId, 'product_id': productId, 'price': price}));
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static updatePrice(id, price) async {
+    try {
+      var res = await dio.post(Uri.encodeFull("/admin/prices/update.php/$id"), data: FormData.fromMap({'price': price}));
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
   }
 
   static addShift(nama, start, end) async {
@@ -60,8 +130,7 @@ class Services {
     Map<String, dynamic> registerData = await Local.getRegisterData();
     try {
       if (await Local.getRegisterMode() == 'admin') {
-        var resp = await dio.post(Uri.decodeFull('/admin/auth/register.php'),
-            data: FormData.fromMap(registerData));
+        var resp = await dio.post(Uri.decodeFull('/admin/auth/register.php'), data: FormData.fromMap(registerData));
         if (resp.data['success']) {
           await Local.setUserData(resp.data['data'][0]);
           await Local.setReceiptData(resp.data['data'][0]);
@@ -95,8 +164,7 @@ class Services {
   addOutlet() async {
     Map<String, dynamic> addOutletData = await Local.getAddOutletData();
     try {
-      var resp = await dio.post(Uri.encodeFull('/admin/stores/create.php'),
-          data: FormData.fromMap(addOutletData));
+      var resp = await dio.post(Uri.encodeFull('/admin/stores/create.php'), data: FormData.fromMap(addOutletData));
       return resp.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -160,73 +228,6 @@ class Services {
     return hasil;
   }
 
-  Future<List<Map>> getItems(outletId) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    List<Map> hasil = [
-      {
-        'id': '1',
-        'nama': 'Tambah Angin Motor',
-        'kategori': '1',
-        'harga': '3000',
-        'icon': '1',
-        'outlet_id': '1',
-        'outlet_nama': 'Outlet 1',
-      },
-      {
-        'id': '2',
-        'nama': 'Tambah Angin Mobil',
-        'kategori': '2',
-        'harga': '5000',
-        'icon': '1',
-        'outlet_id': '1',
-        'outlet_nama': 'Outlet 1',
-      },
-      {
-        'id': '3',
-        'nama': 'Ganti Angin Motor',
-        'kategori': '1',
-        'harga': '7000',
-        'icon': '2',
-        'outlet_id': '1',
-        'outlet_nama': 'Outlet 1',
-      },
-      {
-        'id': '4',
-        'nama': 'Ganti Angin Mobil',
-        'kategori': '2',
-        'harga': '9000',
-        'icon': '2',
-        'outlet_id': '1',
-        'outlet_nama': 'Outlet 1',
-      },
-      {
-        'id': '5',
-        'nama': 'Tambal Ban Motor',
-        'kategori': '1',
-        'harga': '10000',
-        'icon': '3',
-        'outlet_id': '1',
-        'outlet_nama': 'Outlet 1',
-      },
-      {
-        'id': '6',
-        'nama': 'Tambal Ban Mobil',
-        'kategori': '2',
-        'harga': '20000',
-        'icon': '3',
-        'outlet_id': '1',
-        'outlet_nama': 'Outlet 1',
-      },
-    ];
-
-    hasil = hasil
-        .where((element) => element['outlet_id'] == outletId.toString())
-        .toList();
-
-    return hasil;
-  }
-
   Future<List<Map>> getKategories() async {
     await Future.delayed(const Duration(seconds: 1));
     List<Map> hasil = [
@@ -267,12 +268,7 @@ class Services {
       },
     ];
 
-    hasil = hasil
-        .where((element) => element['nama']
-            .toString()
-            .toLowerCase()
-            .contains(keyword.toLowerCase()))
-        .toList();
+    hasil = hasil.where((element) => element['nama'].toString().toLowerCase().contains(keyword.toLowerCase())).toList();
 
     return hasil;
   }
@@ -281,42 +277,6 @@ class Services {
     await Future.delayed(const Duration(seconds: 1));
 
     return "Axd679";
-  }
-
-  Future<List<Map>> getOutlets(int id) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    List<Map> hasil = [
-      {
-        'id': '1',
-        'nama': 'Outlet 1',
-        'mesin_id': 'asRf2',
-        'lat': '-7.316817334144685',
-        'lon': '112.7254388237554',
-        'addr':
-            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
-      },
-      {
-        'id': '2',
-        'nama': 'Outlet 2',
-        'mesin_id': 'asRf2',
-        'lat': '-7.316817334144685',
-        'lon': '112.7254388237554',
-        'addr':
-            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
-      },
-      {
-        'id': '3',
-        'nama': 'Outlet 3',
-        'mesin_id': 'asRf2',
-        'lat': '-7.316817334144685',
-        'lon': '112.7254388237554',
-        'addr':
-            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
-      },
-    ];
-
-    return hasil;
   }
 
   Future<List<Map>> getShift() async {
@@ -554,12 +514,10 @@ class Services {
         'image_out': 'https://picsum.photos/200/300',
         'lat_in': '-7.31686186932247',
         'lon_in': '112.72543698655583',
-        'addr_in':
-            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
+        'addr_in': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
         'lat_out': '-7.316906755372916',
         'lon_out': '112.72549852076374',
-        'addr_out':
-            'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
+        'addr_out': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
         'omset': '1000000',
         'shift': '2',
         'keterangan': 'Tepat Waktu',
@@ -569,8 +527,7 @@ class Services {
 
   Future<List> getPetugasLaporanPenjualan(DateTimeRange range) async {
     await Future.delayed(const Duration(seconds: 1));
-    if (DateFormat('y-MM-d HH:m').format(range.start) ==
-        DateFormat('y-MM-d HH:m').format(range.end)) {
+    if (DateFormat('y-MM-d HH:m').format(range.start) == DateFormat('y-MM-d HH:m').format(range.end)) {
       return [
         {
           'id': '1',

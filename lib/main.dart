@@ -1,7 +1,11 @@
+import 'package:aplikasi_kasir/api/local.dart';
+import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
+import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:lottie/lottie.dart';
 
 void main() async {
   // runApp(MyApp());
@@ -63,7 +67,20 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff0E0E52)),
         useMaterial3: true,
       ),
-      home: const OnBoardingPage(),
+      home: FutureBuilder(
+          future: Local.getLogin(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return Center(child: LottieBuilder.asset('assets/lotties/loading.json'));
+            if (snapshot.data!['value']) {
+              if (snapshot.data!['role'] == 'admin') {
+                return const DashboardPage();
+              } else {
+                return KatalogPage();
+              }
+            } else {
+              return const OnBoardingPage();
+            }
+          }),
     );
   }
 }

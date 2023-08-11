@@ -89,7 +89,7 @@ class KatalogPage extends ConsumerWidget {
                 ],
               ),
             ),
-            ref.watch(futureGetOutletsProvider(1)).when(
+            ref.watch(futureGetOutletsProvider).when(
                   skipLoadingOnRefresh: false,
                   data: (data) {
                     return DropdownButtonFormField(
@@ -108,9 +108,10 @@ class KatalogPage extends ConsumerWidget {
                       highlightColor: Colors.white.withOpacity(0.5),
                       child: Container(margin: const EdgeInsets.symmetric(horizontal: 20), height: 55, color: Colors.black)),
                 ),
-            ref.watch(futureGetItemsProvider(1)).when(
+            ref.watch(futureGetItemsProvider).when(
                   skipLoadingOnRefresh: false,
-                  data: (items) {
+                  data: (data) {
+                    var items = data['data'];
                     if (countItem.length != items.length) {
                       for (int i = 0; i < items.length; i++) {
                         ref.read(countItemProvider).add({

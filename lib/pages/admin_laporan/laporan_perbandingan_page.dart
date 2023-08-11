@@ -29,16 +29,19 @@ class LaporanPerbandinganPage extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            ref.watch(futureGetOutletsProvider(1)).when(
-                  data: (data) => DropdownButtonFormField(
-                      items: data.map((e) => DropdownMenuItem(value: e, child: Text(e['nama']))).toList(),
-                      value: data.first,
-                      onChanged: (value) {
-                        ref.read(parameterPerbandinganReportProvider.notifier).state = {
-                          'date': date,
-                          'outlet_id': value!['id'],
-                        };
-                      }),
+            ref.watch(futureGetOutletsProvider).when(
+                  data: (result) {
+                    List<Map> data = result['data'];
+                    return DropdownButtonFormField(
+                        items: data.map((e) => DropdownMenuItem(value: e, child: Text(e['nama']))).toList(),
+                        value: data.first,
+                        onChanged: (value) {
+                          ref.read(parameterPerbandinganReportProvider.notifier).state = {
+                            'date': date,
+                            'outlet_id': value!['id'],
+                          };
+                        });
+                  },
                   error: (error, stackTrace) => const Center(child: Text('Gagal Ambil Data')),
                   loading: () => Shimmer.fromColors(baseColor: Colors.transparent, highlightColor: Colors.white.withOpacity(0.5), child: Container(height: 55, color: Colors.black)),
                 ),

@@ -1,40 +1,94 @@
 import 'package:aplikasi_kasir/api/services.dart';
+import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_layanan_harga_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../api/providers.dart';
-import '../../utils/formatter.dart';
 import '../../utils/textstyles.dart';
 import '../../widgets/admin_drawer.dart';
 import '../../widgets/custom_icons.dart';
 
-// ignore: must_be_immutable
 class ManajemenLayananPage extends ConsumerWidget {
-  ManajemenLayananPage({super.key});
   TextEditingController search = TextEditingController();
 
+  ManajemenLayananPage({super.key});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, ref) {
     var size = MediaQuery.of(context).size;
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Manajemen Layanan'),
+          bottom: TabBar(
+            indicatorColor: Colors.white,
+            dividerColor: Theme.of(context).primaryColor,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.grey,
+            tabs: const [
+              Tab(text: 'Produk'),
+              Tab(text: 'Harga'),
+            ],
+          ),
+        ),
+        drawer: DrawerAdmin(size: size, active: 3),
+        body: TabBarView(
+          children: [produkPage(ref, context), pricePage(ref, context)],
+        ),
+      ),
+    );
+  }
 
+  RefreshIndicator pricePage(WidgetRef ref, BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(futureGetOutletsProvider);
+      },
+      child: ref.watch(futureGetOutletsProvider).when(
+          skipLoadingOnRefresh: false,
+          data: (data) {
+            if (data['success']) {
+              return ListView.builder(
+                padding: const EdgeInsets.all(20),
+                itemCount: data['data'].length,
+                itemBuilder: (context, index) => Card(
+                  color: const Color(0xffF6F6F6),
+                  surfaceTintColor: const Color(0xffF6F6F6),
+                  elevation: 5,
+                  child: ListTile(
+                    title: Text(data['data'][index]['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text(data['data'][index]['addr']),
+                    onTap: () async {
+                      await Future.delayed(const Duration(milliseconds: 200));
+                      push(context, ManajemenLayananHargaPage(outletId: data['data'][index]['id'], outletName: data['data'][index]['name']));
+                    },
+                  ),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['errors'])));
+              return Center(child: Image.asset('assets/images/error.pnh'));
+            }
+          },
+          error: (error, stackTrace) => Center(child: Image.asset('assets/images/error.png')),
+          loading: () => Center(child: LottieBuilder.asset('assets/lotties/loading.json'))),
+    );
+  }
+
+  Scaffold produkPage(WidgetRef ref, BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manajemen Layanan')),
-      drawer: DrawerAdmin(size: size, active: 3),
       floatingActionButton: FloatingActionButton(
           backgroundColor: const Color(0xff449DD1),
           foregroundColor: Colors.white,
           onPressed: () async {
             await Future.delayed(const Duration(milliseconds: 200));
             var name = TextEditingController();
-            var harga = TextEditingController();
             int icon = 0;
-
             // ignore: use_build_context_synchronously
-            modalItemManajemen(ref, context, icon, name, harga, null, null);
+            modalItemManajemen(ref, context, null, icon, name, null, 'Tambah Layanan');
           },
           child: const Icon(Icons.add)),
       body: RefreshIndicator(
@@ -59,14 +113,14 @@ class ManajemenLayananPage extends ConsumerWidget {
                 ],
               ),
             ),
-            ref.watch(futureGetItemsProvider(1)).when(
+            ref.watch(futureGetItemsProvider).when(
                   skipLoadingOnRefresh: false,
                   data: (items) {
                     List showItems;
                     if (search.text.isNotEmpty) {
-                      showItems = items.where((element) => element['nama'].toString().toLowerCase().contains(search.text.toLowerCase())).toList();
+                      showItems = items['data'].where((element) => element['name'].toString().toLowerCase().contains(search.text.toLowerCase())).toList();
                     } else {
-                      showItems = items;
+                      showItems = items['data'];
                     }
 
                     return ListView.builder(
@@ -80,17 +134,19 @@ class ManajemenLayananPage extends ConsumerWidget {
                           elevation: 5,
                           child: ListTile(
                             leading: CustomIcon(id: int.parse(showItems[index]['icon'])),
-                            title: Text(showItems[index]['nama'] ?? 'NULL', style: TextStyles.h3),
-                            subtitle: Text("[${showItems[index]['outlet_nama']}] ${numberFormat.format(int.parse(showItems[index]['harga']))}", style: TextStyles.p),
+                            title: Text(showItems[index]['name'] ?? 'NULL', style: TextStyles.h3),
                             contentPadding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                            trailing: IconButton(icon: const Icon(Icons.border_color), onPressed: () {}),
-                            onTap: () {
-                              var name = TextEditingController(text: showItems[index]['nama']);
-                              var harga = TextEditingController(text: showItems[index]['harga']);
+                            trailing: IconButton(
+                                icon: const Icon(Icons.border_color),
+                                onPressed: () {
+                                  var name = TextEditingController(text: showItems[index]['name']);
+                                  var icon = int.parse(showItems[index]['icon']);
+                                  modalItemManajemen(ref, context, showItems[index]['id'], icon, name, showItems[index]['device_product'], 'Ubah Layanan');
+                                }),
+                            onTap: () async {
+                              var name = TextEditingController(text: showItems[index]['name']);
                               var icon = int.parse(showItems[index]['icon']);
-                              var kategori = int.parse(showItems[index]['kategori']);
-                              var outlet = int.parse(showItems[index]['outlet_id']);
-                              modalItemManajemen(ref, context, icon, name, harga, kategori, outlet);
+                              modalItemManajemen(ref, context, showItems[index]['id'], icon, name, showItems[index]['device_product'], 'Ubah Layanan');
                             },
                           )),
                     );
@@ -107,7 +163,7 @@ class ManajemenLayananPage extends ConsumerWidget {
     );
   }
 
-  Future<dynamic> modalItemManajemen(WidgetRef ref, BuildContext context, int icon, TextEditingController name, TextEditingController harga, int? kategori, int? outlet) {
+  Future<dynamic> modalItemManajemen(WidgetRef ref, BuildContext context, id, int icon, TextEditingController name, deviceProduct, title) {
     return showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
@@ -121,7 +177,7 @@ class ManajemenLayananPage extends ConsumerWidget {
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               children: [
-                Text('Tambah Layanan', textAlign: TextAlign.center, style: TextStyles.h2),
+                Text(title, textAlign: TextAlign.center, style: TextStyles.h2),
                 const SizedBox(height: 20),
                 Text('Pilih Icon', style: TextStyles.h3),
                 const SizedBox(height: 20),
@@ -144,29 +200,6 @@ class ManajemenLayananPage extends ConsumerWidget {
                 const SizedBox(height: 20),
                 TextField(controller: name, keyboardType: TextInputType.name, decoration: const InputDecoration(hintText: 'Nama Layanan')),
                 const SizedBox(height: 20),
-                TextField(controller: harga, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'Harga')),
-                const SizedBox(height: 20),
-                ref.watch(futureGetOutletsProvider(1)).when(
-                      data: (data) => DropdownButtonFormField(
-                        hint: const Text('Pilih Outlet'),
-                        items: data
-                            .map((e) => DropdownMenuItem(
-                                  value: int.parse(e['id']),
-                                  child: Text(e['nama']),
-                                ))
-                            .toList(),
-                        value: outlet,
-                        onChanged: (value) => setState(() {
-                          outlet = value;
-                        }),
-                      ),
-                      error: (error, stackTrace) => const Center(child: Text('Gagal Ambil Data')),
-                      loading: () => Shimmer.fromColors(
-                          baseColor: Colors.transparent,
-                          highlightColor: Colors.white.withOpacity(0.5),
-                          child: Container(margin: const EdgeInsets.symmetric(horizontal: 20), height: 55, color: Colors.black)),
-                    ),
-                const SizedBox(height: 20),
                 ElevatedButton(
                     onPressed: () async {
                       if (name.text.isEmpty) {
@@ -174,17 +207,63 @@ class ManajemenLayananPage extends ConsumerWidget {
                             context: context,
                             builder: (context) => CupertinoAlertDialog(content: const Text('Nama tidak boleh kosong'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
                         return;
-                      } else if (harga.text.isEmpty) {
-                        showCupertinoDialog(
-                            context: context,
-                            builder: (context) => CupertinoAlertDialog(content: const Text('Harga tidak boleh kosong'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
-                        return;
                       }
                       showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
-                      await Services.addItems(icon, name.text, harga.text, kategori);
-                      pushAndRemoveUntil(context, ManajemenLayananPage());
+                      if (title == 'Ubah Layanan') {
+                        Map res = await Services.editItems(id, icon, name.text);
+                        if (res['success']) {
+                          ref.invalidate(futureGetItemsProvider);
+                          pushAndRemoveUntil(context, ManajemenLayananPage());
+                        } else {
+                          pop(context);
+                          showCupertinoDialog(
+                              context: context, builder: (context) => CupertinoAlertDialog(content: Text(res['errors']), actions: [TextButton(onPressed: () => pop(context), child: const Text('OK'))]));
+                        }
+                      } else {
+                        Map res = await Services.addItems(icon, name.text);
+                        if (res['success']) {
+                          ref.invalidate(futureGetItemsProvider);
+                          pushAndRemoveUntil(context, ManajemenLayananPage());
+                        } else {
+                          pop(context);
+                          showCupertinoDialog(
+                              context: context, builder: (context) => CupertinoAlertDialog(content: Text(res['errors']), actions: [TextButton(onPressed: () => pop(context), child: const Text('OK'))]));
+                        }
+                      }
                     },
                     child: const Text('Simpan')),
+                const SizedBox(height: 20),
+                deviceProduct == "0" && deviceProduct != null
+                    ? ElevatedButton(
+                        onPressed: () {
+                          showCupertinoDialog(
+                            context: context,
+                            builder: (context) => CupertinoAlertDialog(
+                              content: const Text('Yakin Untuk Menghapus Data ?'),
+                              actions: [
+                                TextButton(
+                                    onPressed: () async {
+                                      showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
+                                      var res = await Services.deleteItems(id);
+                                      if (res['success']) {
+                                        ref.invalidate(futureGetItemsProvider);
+                                        pushAndRemoveUntil(context, ManajemenLayananPage());
+                                      } else {
+                                        pop(context);
+                                        showCupertinoDialog(
+                                            context: context,
+                                            builder: (context) => CupertinoAlertDialog(content: Text(res['errors']), actions: [TextButton(onPressed: () => pop(context), child: const Text('OK'))]));
+                                      }
+                                    },
+                                    child: const Text('Hapus')),
+                                TextButton(onPressed: () => pop(context), child: const Text('Batal'))
+                              ],
+                            ),
+                          );
+                        },
+                        style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
+                        child: const Text('Hapus'))
+                    : const SizedBox(),
                 const SizedBox(height: 20),
               ],
             ),
