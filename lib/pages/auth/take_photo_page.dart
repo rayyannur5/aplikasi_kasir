@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../admin_manajemen/manajemen_add_outlet_page.dart';
+
 class TakePhotoPage extends StatefulWidget {
   const TakePhotoPage({super.key, required this.dataDevice});
   final Map dataDevice;
@@ -94,7 +96,7 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                 ),
                 child: const Text('Lanjutkan')),
             const SizedBox(height: 10),
-            TextButton(onPressed: () => push(context, RegisterBrandPage(dataDevice: widget.dataDevice)), child: const Text("Lewati")),
+            TextButton(onPressed: () => push(context, AddOutletPage(dataDevice: widget.dataDevice)), child: const Text("Lewati")),
           ],
         ),
       ),

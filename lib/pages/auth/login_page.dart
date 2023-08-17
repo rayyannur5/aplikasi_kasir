@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/api/services.dart';
+import 'package:aplikasi_kasir/pages/auth/not_verified_page.dart';
 import 'package:aplikasi_kasir/pages/auth/register_page.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
@@ -32,12 +33,12 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-
   bool isEmail(String em) {
     RegExp regExp = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
 
     return regExp.hasMatch(em);
   }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -69,7 +70,9 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Text('Masukkan email dan password', style: TextStyles.h3),
             const SizedBox(height: 30),
-            TextFormField(controller: email, validator: (value) {
+            TextFormField(
+                controller: email,
+                validator: (value) {
                   if (value!.isEmpty) {
                     return "Kolom tidak boleh kosong";
                   } else if (!isEmail(value)) {
@@ -77,9 +80,12 @@ class _LoginPageState extends State<LoginPage> {
                   } else {
                     return null;
                   }
-                }, decoration: const InputDecoration(labelText: 'Email')),
+                },
+                decoration: const InputDecoration(labelText: 'Email')),
             const SizedBox(height: 20),
-            TextFormField(controller: password, validator: (value) {
+            TextFormField(
+                controller: password,
+                validator: (value) {
                   if (value!.isEmpty) {
                     return "Kolom tidak boleh kosong";
                   } else if (value.length < 4) {
@@ -87,7 +93,9 @@ class _LoginPageState extends State<LoginPage> {
                   } else {
                     return null;
                   }
-                }, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
+                },
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password')),
             const SizedBox(height: 50),
             ElevatedButton(
                 onPressed: () {
@@ -105,22 +113,25 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   login() async {
-    if(_formKey.currentState!.validate()){
-
-    showDialog(context: context, barrierDismissible: false, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
-    Map response = await Services.login(email.text, password.text);
-    if (response['success']) {
-      var userData = await Local.getUserData();
-      if (userData['user_role'] == 'admin') {
-        pushAndRemoveUntil(context, const DashboardPage());
+    if (_formKey.currentState!.validate()) {
+      showDialog(context: context, barrierDismissible: false, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
+      Map response = await Services.login(email.text, password.text);
+      if (response['success']) {
+        var userData = await Local.getUserData();
+        if (userData['user_role'] == 'admin') {
+          pushAndRemoveUntil(context, const DashboardPage());
+        } else {
+          if (response['data'][0]['active'] == '1') {
+            pushAndRemoveUntil(context, KatalogPage());
+          } else {
+            pushAndRemoveUntil(context, NotVerifiedPage());
+          }
+        }
       } else {
-        pushAndRemoveUntil(context, KatalogPage());
+        pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['errors'])));
+        return;
       }
-    } else {
-      pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['errors'])));
-      return;
-    }
     }
   }
 

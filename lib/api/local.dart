@@ -20,10 +20,8 @@ class Local {
         'email': pref.getString('temp_register_email'),
         'phone': pref.getString('temp_register_phone'),
         'password': pref.getString('temp_register_password'),
+        'city': pref.getString('temp_city'),
         'profile_picture': 'https://picsum.photos/200/300',
-        'receipt_phone': pref.getString('temp_register_receipt_phone'),
-        'receipt_brand': pref.getString('temp_register_receipt_brand'),
-        'receipt_message': pref.getString('temp_register_receipt_message')
       };
     } else {
       return {
@@ -31,6 +29,7 @@ class Local {
         'email': pref.getString('temp_register_email'),
         'phone': pref.getString('temp_register_phone'),
         'password': pref.getString('temp_register_password'),
+        'refferal': pref.getString('temp_refferal'),
         'profile_picture': 'https://picsum.photos/200/300',
       };
     }
@@ -74,6 +73,11 @@ class Local {
     };
   }
 
+  static Future setCityId(id) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setString('temp_add_outlet_city_id', id);
+  }
+
   static Future setReceiptData(Map data) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await pref.setString('receipt_brand', data['receipt_brand']);
@@ -102,7 +106,7 @@ class Local {
     return {
       'admin_id': pref.getString('user_id'),
       'device_id': pref.getString('temp_add_outlet_device_id'),
-      'city_id': 1,
+      'city_id': pref.getString('temp_add_outlet_city_id'),
       'name': pref.getString('temp_add_outlet_name'),
       'lat': pref.getDouble('temp_add_outlet_lat'),
       'lon': pref.getDouble('temp_add_outlet_lon'),

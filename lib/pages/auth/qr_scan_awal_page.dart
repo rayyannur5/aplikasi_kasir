@@ -1,5 +1,6 @@
 import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/api/services.dart';
+import 'package:aplikasi_kasir/pages/auth/pegawai_refferal_page.dart';
 import 'package:aplikasi_kasir/pages/auth/take_photo_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,7 +22,14 @@ class ScanQRAwalPage extends StatelessWidget {
           FloatingActionButton(
               onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), backgroundColor: Colors.red, foregroundColor: Colors.white, child: const Icon(Icons.close)),
           const SizedBox(width: 20),
-          Expanded(child: ElevatedButton(onPressed: () {}, child: const Text("Daftar Sebagai Pegawai"))),
+          Expanded(
+              child: ElevatedButton(
+                  onPressed: () async {
+                    await Local.setRegisterMode('user');
+                    await Future.delayed(Duration(milliseconds: 200));
+                    pushReplacement(context, InputKodeRefferalPage());
+                  },
+                  child: const Text("Daftar Sebagai Pegawai"))),
           const SizedBox(width: 20),
         ],
       ),
@@ -37,7 +45,7 @@ class ScanQRAwalPage extends StatelessWidget {
               var resp = await Services().checkDevice(barcodes.first.rawValue);
               if (resp != null) {
                 pop(context);
-                Local.setRegisterMode('admin');
+                await Local.setRegisterMode('admin');
                 pushReplacement(context, TakePhotoPage(dataDevice: resp));
               } else {
                 pop(context);

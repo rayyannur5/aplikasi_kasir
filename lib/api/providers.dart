@@ -24,7 +24,7 @@ var futureChartTodayTransactionsProvider = FutureProvider((ref) => ref.watch(ser
 // MANAJEMEN LAYANAN
 var futureGetItemsProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getItems());
 
-var futureGetEmployeesProvider = FutureProvider.autoDispose.family((ref, String keyword) => ref.watch(servicesProvider).getEmployees(keyword));
+var futureGetEmployeesProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getEmployees());
 var futureGetKodeReferralProvider = FutureProvider((ref) => ref.watch(servicesProvider).getKodeReferral());
 var futureGetPricesProvider = FutureProvider.family.autoDispose((ref, String storeId) => ref.watch(servicesProvider).getPrices(storeId));
 

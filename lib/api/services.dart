@@ -82,8 +82,15 @@ class Services {
   Future getOutlets() async {
     try {
       var userData = await Local.getUserData();
-      var res = await dio.get(Uri.encodeFull("/admin/stores/get.php"), queryParameters: {'admin_id': userData['user_id']});
-      return res.data;
+      var loginData = await Local.getLogin();
+
+      if (loginData['role'] == 'admin') {
+        var res = await dio.get(Uri.encodeFull("/admin/stores/get.php"), queryParameters: {'admin_id': userData['user_id']});
+        return res.data;
+      } else {
+        var res = await dio.get(Uri.encodeFull("/pegawai/stores/get.php"), queryParameters: {'pegawai_id': userData['user_id']});
+        return res.data;
+      }
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
     }
@@ -116,6 +123,15 @@ class Services {
     }
   }
 
+  static verifyPegawai(pegawaiId, value) async {
+    try {
+      var res = await dio.post("/admin/pegawais/verify.php/$pegawaiId", data: FormData.fromMap({'value': value}));
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
   static addShift(nama, start, end) async {
     await Future.delayed(const Duration(seconds: 1));
     return true;
@@ -130,13 +146,25 @@ class Services {
     Map<String, dynamic> registerData = await Local.getRegisterData();
     try {
       if (await Local.getRegisterMode() == 'admin') {
-        var resp = await dio.post(Uri.decodeFull('/admin/auth/register.php'), data: FormData.fromMap(registerData));
+        var resp = await dio.post('/admin/auth/register.php', data: FormData.fromMap(registerData));
         if (resp.data['success']) {
           await Local.setUserData(resp.data['data'][0]);
           await Local.setReceiptData(resp.data['data'][0]);
+          await Local.setCityId(resp.data['data'][0]['first_city_id']);
+          await Local.setLogin(true);
         }
         return resp.data;
-      } else {}
+      } else {
+        var resp = await dio.post('/pegawai/auth/register.php', data: FormData.fromMap(registerData));
+        if (resp.data['success']) {
+          print(resp.data['data']);
+          await Local.setUserData(resp.data['data'][0]);
+          await Local.setReceiptData(resp.data['data'][0]);
+          await Local.setCityId(resp.data['data'][0]['city_id']);
+          await Local.setLogin(true);
+        }
+        return resp.data;
+      }
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
     }
@@ -161,11 +189,43 @@ class Services {
     }
   }
 
+  static Future getCities() async {
+    try {
+      Map userData = await Local.getUserData();
+    } catch (e) {}
+  }
+
+  static Future addCities() async {
+    try {
+      Map userData = await Local.getUserData();
+    } catch (e) {}
+  }
+
   addOutlet() async {
     Map<String, dynamic> addOutletData = await Local.getAddOutletData();
     try {
       var resp = await dio.post(Uri.encodeFull('/admin/stores/create.php'), data: FormData.fromMap(addOutletData));
       return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getEmployees() async {
+    try {
+      var userData = await Local.getUserData();
+      var res = await dio.get(Uri.encodeFull('/admin/pegawais/get.php'), queryParameters: {'admin_id': userData['user_id']});
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future<Map> getKodeReferral() async {
+    try {
+      var userData = await Local.getUserData();
+      var res = await dio.get(Uri.encodeFull('/admin/pegawais/refferal.php'), queryParameters: {'admin_id': userData['user_id']});
+      return res.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
     }
@@ -245,38 +305,6 @@ class Services {
       },
     ];
     return hasil;
-  }
-
-  Future<List<Map>> getEmployees(String keyword) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    List<Map> hasil = [
-      {
-        'id': '1',
-        'nama': 'Budi Santoso',
-        'email': 'budi@gmail.com',
-      },
-      {
-        'id': '2',
-        'nama': 'Panji',
-        'email': 'panji@gmail.com',
-      },
-      {
-        'id': '3',
-        'nama': 'Rendi',
-        'email': 'rendi@gmail.com',
-      },
-    ];
-
-    hasil = hasil.where((element) => element['nama'].toString().toLowerCase().contains(keyword.toLowerCase())).toList();
-
-    return hasil;
-  }
-
-  Future<String> getKodeReferral() async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    return "Axd679";
   }
 
   Future<List<Map>> getShift() async {

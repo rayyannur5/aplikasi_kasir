@@ -42,13 +42,14 @@ class ManajemenLayananHargaPage extends ConsumerWidget {
                     itemBuilder: (context, index) => Card(
                       color: const Color(0xffF6F6F6),
                       surfaceTintColor: const Color(0xffF6F6F6),
-                      elevation: 5,
+                      elevation: 0,
                       child: ListTile(
                         leading: CustomIcon(id: int.parse(data['data'][index]['icon'])),
                         title: Text(data['data'][index]['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(data['data'][index]['price'] != null ? (numberFormat.format(int.parse(data['data'][index]['price']))) : 'Belum ada harga'),
                         trailing: const Icon(Icons.edit),
-                        onTap: () {
+                        onTap: () async {
+                          await Future.delayed(Duration(milliseconds: 200));
                           priceBottomSheet(context, ref, data['data'][index], index);
                         },
                       ),

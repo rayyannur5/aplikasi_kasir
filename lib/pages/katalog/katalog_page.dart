@@ -91,10 +91,11 @@ class KatalogPage extends ConsumerWidget {
             ),
             ref.watch(futureGetOutletsProvider).when(
                   skipLoadingOnRefresh: false,
-                  data: (data) {
+                  data: (result) {
+                    List data = result['data'];
                     return DropdownButtonFormField(
                       value: data.first,
-                      items: data.map((e) => DropdownMenuItem(value: e, child: Text(e['nama']))).toList(),
+                      items: data.map((e) => DropdownMenuItem(value: e, child: Text(e['name']))).toList(),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       borderRadius: BorderRadius.circular(10),
                       onChanged: (value) {

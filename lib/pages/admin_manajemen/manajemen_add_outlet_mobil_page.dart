@@ -35,6 +35,8 @@ class _ManajemenAddOutletMobilPageState extends State<ManajemenAddOutletMobilPag
   bool valuePauseMobil = false;
   bool valueErrorMobil = false;
 
+  bool isLoading = false;
+
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -44,46 +46,48 @@ class _ManajemenAddOutletMobilPageState extends State<ManajemenAddOutletMobilPag
       floatingActionButton: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: ElevatedButton(
-            onPressed: () async {
-              if (_formKey.currentState!.validate()) {
-                showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
+            onPressed: isLoading
+                ? null
+                : () async {
+                    if (_formKey.currentState!.validate()) {
+                      setState(() => isLoading = true);
 
-                var pref = await SharedPreferences.getInstance();
-                await pref.setString("temp_add_outlet_device_product_2", tambahAnginMobil.text);
-                await pref.setString("temp_add_outlet_device_product_4", isiBaruMobil.text);
-                await pref.setString("temp_add_outlet_device_product_6", tambalBanMobil.text);
-                await pref.setString("temp_add_outlet_device_product_8", pasMobil.text);
-                await pref.setString("temp_add_outlet_device_product_10", kurangiMobil.text);
-                await pref.setString("temp_add_outlet_device_product_12", pauseMobil.text);
-                await pref.setString("temp_add_outlet_device_product_14", errorMobil.text);
+                      var pref = await SharedPreferences.getInstance();
+                      await pref.setString("temp_add_outlet_device_product_2", tambahAnginMobil.text);
+                      await pref.setString("temp_add_outlet_device_product_4", isiBaruMobil.text);
+                      await pref.setString("temp_add_outlet_device_product_6", tambalBanMobil.text);
+                      await pref.setString("temp_add_outlet_device_product_8", pasMobil.text);
+                      await pref.setString("temp_add_outlet_device_product_10", kurangiMobil.text);
+                      await pref.setString("temp_add_outlet_device_product_12", pauseMobil.text);
+                      await pref.setString("temp_add_outlet_device_product_14", errorMobil.text);
 
-                bool isLogin = pref.getBool('is_login') ?? false;
-                if (isLogin) {
-                  var createStoresResp = await Services().addOutlet();
-                  if (createStoresResp['success']) {
-                    pushAndRemoveUntil(context, ManajemenOutletPage());
-                  } else {
-                    pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("LOGIN : " + createStoresResp['errors'])));
-                  }
-                } else {
-                  var registerResp = await Services().register();
-                  if (registerResp['success']) {
-                    var createStoresResp = await Services().addOutlet();
-                    if (createStoresResp['success']) {
-                      pushAndRemoveUntil(context, const DashboardPage());
-                    } else {
-                      pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("LOGOUT : " + createStoresResp['errors'])));
+                      bool isLogin = pref.getBool('is_login') ?? false;
+                      if (isLogin) {
+                        var createStoresResp = await Services().addOutlet();
+                        setState(() => isLoading = false);
+                        if (createStoresResp['success']) {
+                          pushAndRemoveUntil(context, ManajemenOutletPage());
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("LOGIN : " + createStoresResp['errors'])));
+                        }
+                      } else {
+                        var registerResp = await Services().register();
+                        if (registerResp['success']) {
+                          var createStoresResp = await Services().addOutlet();
+                          setState(() => isLoading = false);
+                          if (createStoresResp['success']) {
+                            pushAndRemoveUntil(context, const DashboardPage());
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("LOGOUT : " + createStoresResp['errors'])));
+                          }
+                        } else {
+                          setState(() => isLoading = false);
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(registerResp['errors'])));
+                        }
+                      }
                     }
-                  } else {
-                    pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(registerResp['errors'])));
-                  }
-                }
-              }
-            },
-            child: const Text("Lanjutkan")),
+                  },
+            child: isLoading ? const SizedBox(height: 30, width: 30, child: CircularProgressIndicator(color: Colors.white)) : const Text("Lanjutkan")),
       ),
       body: Form(
         key: _formKey,

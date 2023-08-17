@@ -57,7 +57,7 @@ class ManajemenLayananPage extends ConsumerWidget {
                 itemBuilder: (context, index) => Card(
                   color: const Color(0xffF6F6F6),
                   surfaceTintColor: const Color(0xffF6F6F6),
-                  elevation: 5,
+                  elevation: 0,
                   child: ListTile(
                     title: Text(data['data'][index]['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text(data['data'][index]['addr']),
@@ -69,8 +69,8 @@ class ManajemenLayananPage extends ConsumerWidget {
                 ),
               );
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['errors'])));
-              return Center(child: Image.asset('assets/images/error.pnh'));
+              Future.delayed(Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['errors']))));
+              return ListView(children: [const SizedBox(height: 100), Image.asset('assets/images/error.png')]);
             }
           },
           error: (error, stackTrace) => Center(child: Image.asset('assets/images/error.png')),
@@ -116,6 +116,18 @@ class ManajemenLayananPage extends ConsumerWidget {
             ref.watch(futureGetItemsProvider).when(
                   skipLoadingOnRefresh: false,
                   data: (items) {
+                    if (!items['success']) {
+                      Future.delayed(Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(items['errors']))));
+                      return ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: [
+                          const SizedBox(height: 50),
+                          Image.asset('assets/images/error.png'),
+                        ],
+                      );
+                    }
+
                     List showItems;
                     if (search.text.isNotEmpty) {
                       showItems = items['data'].where((element) => element['name'].toString().toLowerCase().contains(search.text.toLowerCase())).toList();
@@ -131,19 +143,14 @@ class ManajemenLayananPage extends ConsumerWidget {
                       itemBuilder: (context, index) => Card(
                           color: const Color(0xffF6F6F6),
                           surfaceTintColor: const Color(0xffF6F6F6),
-                          elevation: 5,
+                          elevation: 0,
                           child: ListTile(
                             leading: CustomIcon(id: int.parse(showItems[index]['icon'])),
                             title: Text(showItems[index]['name'] ?? 'NULL', style: TextStyles.h3),
-                            contentPadding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                            trailing: IconButton(
-                                icon: const Icon(Icons.border_color),
-                                onPressed: () {
-                                  var name = TextEditingController(text: showItems[index]['name']);
-                                  var icon = int.parse(showItems[index]['icon']);
-                                  modalItemManajemen(ref, context, showItems[index]['id'], icon, name, showItems[index]['device_product'], 'Ubah Layanan');
-                                }),
+                            contentPadding: const EdgeInsets.fromLTRB(10, 5, 20, 5),
+                            trailing: Icon(Icons.border_color),
                             onTap: () async {
+                              await Future.delayed(Duration(milliseconds: 200));
                               var name = TextEditingController(text: showItems[index]['name']);
                               var icon = int.parse(showItems[index]['icon']);
                               modalItemManajemen(ref, context, showItems[index]['id'], icon, name, showItems[index]['device_product'], 'Ubah Layanan');
@@ -217,7 +224,8 @@ class ManajemenLayananPage extends ConsumerWidget {
                         } else {
                           pop(context);
                           showCupertinoDialog(
-                              context: context, builder: (context) => CupertinoAlertDialog(content: Text(res['errors']), actions: [TextButton(onPressed: () => pop(context), child: const Text('OK'))]));
+                              context: context,
+                              builder: (context) => CupertinoAlertDialog(content: Text(res['errors']), actions: [TextButton(onPressed: () => pop(context), child: const Text('OK'))]));
                         }
                       } else {
                         Map res = await Services.addItems(icon, name.text);
@@ -227,7 +235,8 @@ class ManajemenLayananPage extends ConsumerWidget {
                         } else {
                           pop(context);
                           showCupertinoDialog(
-                              context: context, builder: (context) => CupertinoAlertDialog(content: Text(res['errors']), actions: [TextButton(onPressed: () => pop(context), child: const Text('OK'))]));
+                              context: context,
+                              builder: (context) => CupertinoAlertDialog(content: Text(res['errors']), actions: [TextButton(onPressed: () => pop(context), child: const Text('OK'))]));
                         }
                       }
                     },
