@@ -189,22 +189,19 @@ class Services {
     }
   }
 
-  static Future getCities() async {
-    try {
-      Map userData = await Local.getUserData();
-    } catch (e) {}
-  }
-
-  static Future addCities() async {
-    try {
-      Map userData = await Local.getUserData();
-    } catch (e) {}
-  }
-
   addOutlet() async {
     Map<String, dynamic> addOutletData = await Local.getAddOutletData();
     try {
-      var resp = await dio.post(Uri.encodeFull('/admin/stores/create.php'), data: FormData.fromMap(addOutletData));
+      var resp = await dio.post('/admin/stores/create.php', data: FormData.fromMap(addOutletData));
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static updateOutlet(id, cityId, name, lat, lon) async {
+    try {
+      var resp = await dio.post('/admin/stores/update.php/$id', data: FormData.fromMap({'city_id': cityId, 'name': name, 'lat': lat, 'lon': lon}));
       return resp.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -225,6 +222,35 @@ class Services {
     try {
       var userData = await Local.getUserData();
       var res = await dio.get(Uri.encodeFull('/admin/pegawais/refferal.php'), queryParameters: {'admin_id': userData['user_id']});
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future<Map> getCities() async {
+    try {
+      var userData = await Local.getUserData();
+      var res = await dio.get('/admin/cities/get.php', queryParameters: {'admin_id': userData['user_id']});
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future addCities(name) async {
+    try {
+      var userData = await Local.getUserData();
+      var res = await dio.post('/admin/cities/create.php', data: FormData.fromMap({'admin_id': userData['user_id'], 'name': name}));
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future updateCities(id, name) async {
+    try {
+      var res = await dio.post('/admin/cities/update.php/$id', data: FormData.fromMap({'name': name}));
       return res.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};

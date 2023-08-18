@@ -69,7 +69,7 @@ class ManajemenLayananPage extends ConsumerWidget {
                 ),
               );
             } else {
-              Future.delayed(Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['errors']))));
+              Future.delayed(const Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['errors']))));
               return ListView(children: [const SizedBox(height: 100), Image.asset('assets/images/error.png')]);
             }
           },
@@ -117,7 +117,7 @@ class ManajemenLayananPage extends ConsumerWidget {
                   skipLoadingOnRefresh: false,
                   data: (items) {
                     if (!items['success']) {
-                      Future.delayed(Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(items['errors']))));
+                      Future.delayed(const Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(items['errors']))));
                       return ListView(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
@@ -148,9 +148,9 @@ class ManajemenLayananPage extends ConsumerWidget {
                             leading: CustomIcon(id: int.parse(showItems[index]['icon'])),
                             title: Text(showItems[index]['name'] ?? 'NULL', style: TextStyles.h3),
                             contentPadding: const EdgeInsets.fromLTRB(10, 5, 20, 5),
-                            trailing: Icon(Icons.border_color),
+                            trailing: const Icon(Icons.border_color),
                             onTap: () async {
-                              await Future.delayed(Duration(milliseconds: 200));
+                              await Future.delayed(const Duration(milliseconds: 200));
                               var name = TextEditingController(text: showItems[index]['name']);
                               var icon = int.parse(showItems[index]['icon']);
                               modalItemManajemen(ref, context, showItems[index]['id'], icon, name, showItems[index]['device_product'], 'Ubah Layanan');

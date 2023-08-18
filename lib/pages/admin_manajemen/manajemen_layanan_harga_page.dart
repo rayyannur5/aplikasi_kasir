@@ -49,7 +49,7 @@ class ManajemenLayananHargaPage extends ConsumerWidget {
                         subtitle: Text(data['data'][index]['price'] != null ? (numberFormat.format(int.parse(data['data'][index]['price']))) : 'Belum ada harga'),
                         trailing: const Icon(Icons.edit),
                         onTap: () async {
-                          await Future.delayed(Duration(milliseconds: 200));
+                          await Future.delayed(const Duration(milliseconds: 200));
                           priceBottomSheet(context, ref, data['data'][index], index);
                         },
                       ),

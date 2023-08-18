@@ -32,6 +32,9 @@ var futureGetOutletsProvider = FutureProvider.autoDispose((ref) => ref.watch(ser
 
 var futureGetShiftProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getShift());
 
+// MANAJEMEN CITY
+var futureGetCitiesProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getCities());
+
 // Ringkasan AI Device
 var futureReportAIDeviceProvider = FutureProvider.autoDispose.family((ref, Map parameterReportAI) => ref.watch(servicesProvider).getAIDevice(parameterReportAI));
 var parameterReportAIProvider = StateProvider(

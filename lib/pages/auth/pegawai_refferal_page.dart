@@ -2,9 +2,7 @@ import 'package:aplikasi_kasir/api/services.dart';
 import 'package:aplikasi_kasir/pages/auth/qr_scan_refferal_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InputKodeRefferalPage extends StatelessWidget {
@@ -18,7 +16,7 @@ class InputKodeRefferalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Kode Refferal')),
+      appBar: AppBar(title: const Text('Kode Refferal')),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: StatefulBuilder(builder: (context, setstate) {
         return Padding(
@@ -34,7 +32,7 @@ class InputKodeRefferalPage extends StatelessWidget {
                         var pref = await SharedPreferences.getInstance();
                         await pref.setString('temp_refferal', refferal.text);
 
-                        await Future.delayed(Duration(milliseconds: 200));
+                        await Future.delayed(const Duration(milliseconds: 200));
 
                         var res = await Services().register();
                         setstate(() {
@@ -48,7 +46,7 @@ class InputKodeRefferalPage extends StatelessWidget {
                         }
                       }
                     },
-              child: _isLoading ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white)) : Text('Lanjutkan')),
+              child: _isLoading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white)) : const Text('Lanjutkan')),
         );
       }),
       body: Padding(
@@ -64,12 +62,13 @@ class InputKodeRefferalPage extends StatelessWidget {
                       child: TextFormField(
                           controller: refferal,
                           validator: (value) {
-                            if (value!.isEmpty)
+                            if (value!.isEmpty) {
                               return "Kolom ini harus diisi";
-                            else
+                            } else {
                               return null;
+                            }
                           },
-                          decoration: InputDecoration(labelText: 'Kode Refferal'))),
+                          decoration: const InputDecoration(labelText: 'Kode Refferal'))),
                   Expanded(
                       child: IconButton(
                           onPressed: () async {
@@ -77,7 +76,7 @@ class InputKodeRefferalPage extends StatelessWidget {
                             refferal.text = res;
                           },
                           tooltip: 'Scan Kode',
-                          icon: Icon(Icons.qr_code))),
+                          icon: const Icon(Icons.qr_code))),
                 ],
               ),
             ],

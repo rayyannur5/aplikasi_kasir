@@ -4,6 +4,7 @@ import 'package:aplikasi_kasir/pages/admin_laporan/laporan_ai_device_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_perbandingan_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_petugas/laporan_petugas_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_year_page.dart';
+import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_city_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_layanan_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_outlet_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_petugas_page.dart';
@@ -105,7 +106,7 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 5 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Area/Kota', style: TextStyles.pLight),
-                onTap: () {},
+                onTap: () => navigate(context, 5, const ManajemenCityPage()),
               ),
               ListTile(
                 tileColor: active == 6 ? Colors.white.withOpacity(0.2) : Colors.transparent,

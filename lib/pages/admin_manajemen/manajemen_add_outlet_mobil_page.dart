@@ -2,10 +2,8 @@ import 'package:aplikasi_kasir/api/services.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_outlet_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ManajemenAddOutletMobilPage extends StatefulWidget {

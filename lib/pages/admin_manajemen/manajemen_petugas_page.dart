@@ -90,16 +90,16 @@ class ManajemenPetugasPage extends ConsumerWidget {
                 Row(
                   children: [
                     const SizedBox(width: 20),
-                    Container(height: 10, width: 10, color: Color(0xFFFFBABA)),
+                    Container(height: 10, width: 10, color: const Color(0xFFFFBABA)),
                     const SizedBox(width: 10),
-                    Text('Belum diverifikasi'),
+                    const Text('Belum diverifikasi'),
                   ],
                 ),
                 Row(
                   children: [
-                    Container(height: 10, width: 10, color: Color(0xffF6F6F6)),
+                    Container(height: 10, width: 10, color: const Color(0xffF6F6F6)),
                     const SizedBox(width: 10),
-                    Text('Sudah diverifikasi'),
+                    const Text('Sudah diverifikasi'),
                     const SizedBox(width: 20),
                   ],
                 ),
@@ -109,7 +109,7 @@ class ManajemenPetugasPage extends ConsumerWidget {
                   skipLoadingOnRefresh: false,
                   data: (result) {
                     if (!result['success']) {
-                      Future.delayed(Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['errors']))));
+                      Future.delayed(const Duration(milliseconds: 200), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['errors']))));
                       return Center(
                         child: Image.asset('assets/images/error.png'),
                       );
@@ -117,7 +117,7 @@ class ManajemenPetugasPage extends ConsumerWidget {
                     List data = result['data'];
 
                     if (data.isEmpty) {
-                      return Padding(padding: EdgeInsets.only(top: 100), child: Image.asset('assets/images/empty.png'));
+                      return Padding(padding: const EdgeInsets.only(top: 100), child: Image.asset('assets/images/empty.png'));
                     }
 
                     if (search.text.isNotEmpty) {
@@ -130,7 +130,7 @@ class ManajemenPetugasPage extends ConsumerWidget {
                       shrinkWrap: true,
                       itemCount: data.length,
                       itemBuilder: (context, index) => Card(
-                        color: data[index]['active'] == '1' ? const Color(0xffF6F6F6) : Color(0xFFFFBABA),
+                        color: data[index]['active'] == '1' ? const Color(0xffF6F6F6) : const Color(0xFFFFBABA),
                         elevation: 0,
                         child: ListTile(
                           title: Text(data[index]['name'], style: TextStyles.h2),
@@ -156,7 +156,7 @@ class ManajemenPetugasPage extends ConsumerWidget {
   }
 
   Future verifikasi(BuildContext context, WidgetRef ref, pegawaiId) async {
-    Future.delayed(Duration(milliseconds: 200));
+    Future.delayed(const Duration(milliseconds: 200));
     bool isLoadingVerifikasi = false;
     bool isLoadingHapus = false;
     showModalBottomSheet(
@@ -182,7 +182,7 @@ class ManajemenPetugasPage extends ConsumerWidget {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res['errors'])));
                           }
                         },
-                  style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
+                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.red)),
                   child: isLoadingHapus ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator()) : const Text('Hapus')),
               const SizedBox(height: 20),
               ElevatedButton(

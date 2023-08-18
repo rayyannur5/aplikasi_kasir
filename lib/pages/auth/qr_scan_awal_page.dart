@@ -26,7 +26,7 @@ class ScanQRAwalPage extends StatelessWidget {
               child: ElevatedButton(
                   onPressed: () async {
                     await Local.setRegisterMode('user');
-                    await Future.delayed(Duration(milliseconds: 200));
+                    await Future.delayed(const Duration(milliseconds: 200));
                     pushReplacement(context, InputKodeRefferalPage());
                   },
                   child: const Text("Daftar Sebagai Pegawai"))),

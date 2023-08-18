@@ -124,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
           if (response['data'][0]['active'] == '1') {
             pushAndRemoveUntil(context, KatalogPage());
           } else {
-            pushAndRemoveUntil(context, NotVerifiedPage());
+            pushAndRemoveUntil(context, const NotVerifiedPage());
           }
         }
       } else {
