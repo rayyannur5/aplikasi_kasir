@@ -10,32 +10,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 
 // ignore: must_be_immutable
-class PembayaranPage extends ConsumerWidget {
-  PembayaranPage({super.key});
-  List? items;
+class PembayaranPage extends StatelessWidget {
+  PembayaranPage({super.key, required this.storeId, required this.items, required this.price});
+  final String storeId;
+  final List items;
+  final int price;
+  final ValueNotifier<int> updateAmount = ValueNotifier(0);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    ref.watch(futureGetItemsProvider.selectAsync((data) {
-      return items = data['data'];
-    }));
-    int amount = ref.watch(amountProvider);
-    int price = ref.watch(priceProvider);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Pembayaran', style: TextStyle(color: Colors.black)), backgroundColor: Colors.white, foregroundColor: Colors.black),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            for (int i = 0; i < items!.length; i++)
-              items![i]['count'] != 0
+            for (int i = 0; i < items.length; i++)
+              items[i]['count'] != 0
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("\u2022 ${items![i]['nama']} \u2715 ${items![i]['count']}"),
-                        Text(numberFormat.format(items![i]['count'] * int.parse(items![i]['harga'])).toString(), style: TextStyles.h2),
+                        Text("\u2022 ${items[i]['name']} \u2715 ${items[i]['count']}"),
+                        Text(numberFormat.format(items[i]['count'] * int.parse(items[i]['price'])).toString(), style: TextStyles.h2),
                       ],
                     )
                   : const SizedBox(),
@@ -58,7 +55,11 @@ class PembayaranPage extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Cash : '),
-                    Text(numberFormat.format(amount).toString(), style: TextStyles.h1),
+                    ValueListenableBuilder(
+                        valueListenable: updateAmount,
+                        builder: (context, val, _) {
+                          return Text(numberFormat.format(val).toString(), style: TextStyles.h1);
+                        }),
                   ],
                 )),
             Container(
@@ -72,14 +73,18 @@ class PembayaranPage extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Kembalian : '),
-                    Text(numberFormat.format(amount - price).toString(), style: TextStyles.h1),
+                    ValueListenableBuilder(
+                        valueListenable: updateAmount,
+                        builder: (context, val, _) {
+                          return Text(numberFormat.format(val - price).toString(), style: TextStyles.h1);
+                        }),
                   ],
                 )),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 GestureDetector(
-                  onTap: () => ref.read(amountProvider.notifier).state = 5000,
+                  onTap: () => updateAmount.value = 5000,
                   child: Container(
                     height: 40,
                     width: size.width / 4 - 20,
@@ -89,7 +94,7 @@ class PembayaranPage extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => ref.read(amountProvider.notifier).state = 10000,
+                  onTap: () => updateAmount.value = 10000,
                   child: Container(
                     height: 40,
                     width: size.width / 4 - 20,
@@ -99,7 +104,7 @@ class PembayaranPage extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => ref.read(amountProvider.notifier).state = 20000,
+                  onTap: () => updateAmount.value = 20000,
                   child: Container(
                     height: 40,
                     width: size.width / 4 - 20,
@@ -109,7 +114,7 @@ class PembayaranPage extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => ref.read(amountProvider.notifier).state = 50000,
+                  onTap: () => updateAmount.value = 50000,
                   child: Container(
                     height: 40,
                     width: size.width / 4 - 20,
@@ -131,9 +136,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}1';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('1', style: TextStyles.h2)),
                 ),
@@ -142,9 +147,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}2';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('2', style: TextStyles.h2)),
                 ),
@@ -153,9 +158,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}3';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('3', style: TextStyles.h2)),
                 ),
@@ -165,11 +170,11 @@ class PembayaranPage extends ConsumerWidget {
                   child: TextButton(
                       onPressed: () {
                         try {
-                          String tempAmount = amount.toString();
+                          String tempAmount = updateAmount.value.toString();
                           tempAmount = tempAmount.substring(0, tempAmount.length - 1);
-                          ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                          updateAmount.value = int.parse(tempAmount);
                         } catch (e) {
-                          ref.read(amountProvider.notifier).state = 0;
+                          updateAmount.value = 0;
                         }
                       },
                       child: Text('Del', style: TextStyles.h2)),
@@ -179,9 +184,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}4';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('4', style: TextStyles.h2)),
                 ),
@@ -190,9 +195,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}5';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('5', style: TextStyles.h2)),
                 ),
@@ -201,25 +206,25 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}6';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('6', style: TextStyles.h2)),
                 ),
                 Container(
                   alignment: Alignment.center,
                   width: size.width / 4 - 20,
-                  child: TextButton(onPressed: () => ref.read(amountProvider.notifier).state = 0, child: Text('C', style: TextStyles.h2)),
+                  child: TextButton(onPressed: () => updateAmount.value = 0, child: Text('C', style: TextStyles.h2)),
                 ),
                 Container(
                   alignment: Alignment.center,
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}7';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('7', style: TextStyles.h2)),
                 ),
@@ -228,9 +233,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}8';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('8', style: TextStyles.h2)),
                 ),
@@ -239,9 +244,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}9';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('9', style: TextStyles.h2)),
                 ),
@@ -254,9 +259,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}0';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('0', style: TextStyles.h2)),
                 ),
@@ -265,9 +270,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}00';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('00', style: TextStyles.h2)),
                 ),
@@ -276,9 +281,9 @@ class PembayaranPage extends ConsumerWidget {
                   width: size.width / 4 - 20,
                   child: TextButton(
                       onPressed: () {
-                        String tempAmount = amount.toString();
+                        String tempAmount = updateAmount.value.toString();
                         tempAmount = '${tempAmount}000';
-                        ref.read(amountProvider.notifier).state = int.parse(tempAmount);
+                        updateAmount.value = int.parse(tempAmount);
                       },
                       child: Text('000', style: TextStyles.h2)),
                 ),
@@ -290,9 +295,6 @@ class PembayaranPage extends ConsumerWidget {
                     );
                     var resp = await Services.createTransactions("data");
                     if (resp) {
-                      ref.invalidate(futureGetItemsProvider);
-                      ref.invalidate(countItemProvider);
-                      ref.invalidate(priceProvider);
                       pushAndRemoveUntil(context, const SuksesPembayaranPage());
                     }
                   },

@@ -72,7 +72,7 @@ class DrawerPetugas extends StatelessWidget {
             tileColor: active == 1 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.local_mall_outlined, color: Colors.white),
             title: Text('Katalog', style: TextStyles.pBoldLight),
-            onTap: () => navigate(context, 1, KatalogPage()),
+            onTap: () => navigate(context, 1, KatalogPage(role: 'user')),
           ),
           ListTile(
             tileColor: active == 2 ? Colors.white.withOpacity(0.2) : Colors.transparent,

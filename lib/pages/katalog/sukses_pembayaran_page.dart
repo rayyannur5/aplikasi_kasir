@@ -1,3 +1,4 @@
+import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/pages/print_page/detail_transaksi_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
@@ -23,7 +24,17 @@ class SuksesPembayaranPage extends StatelessWidget {
                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff449DD1))),
                 child: const Text('Cetak')),
             const SizedBox(height: 10),
-            ElevatedButton(onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pushAndRemoveUntil(context, KatalogPage())), child: const Text('Kembali')),
+            ElevatedButton(
+                onPressed: () async {
+                  await Future.delayed(const Duration(milliseconds: 200));
+                  var loginData = await Local.getLogin();
+                  if (loginData['role'] == 'admin') {
+                    pushAndRemoveUntil(context, KatalogPage(role: 'admin'));
+                  } else {
+                    pushAndRemoveUntil(context, KatalogPage(role: 'user'));
+                  }
+                },
+                child: const Text('Kembali')),
           ],
         ),
       ),

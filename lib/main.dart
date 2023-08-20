@@ -75,11 +75,9 @@ class MyApp extends StatelessWidget {
               if (snapshot.data!['role'] == 'admin') {
                 return const DashboardPage();
               } else {
-                return Builder(
-                  builder: (context) {
-                    return KatalogPage();
-                  }
-                );
+                return Builder(builder: (context) {
+                  return KatalogPage(role: 'user');
+                });
               }
             } else {
               return const OnBoardingPage();

@@ -62,3 +62,6 @@ var parameterPerbandinganReportProvider = StateProvider(
 // Petugas Laporan Penjualan
 var parameterPetugasLaporanPenjualan = StateProvider((ref) => DateTimeRange(start: DateTime.now(), end: DateTime.now()));
 var futurePetugasLaporanPenjualan = FutureProvider.autoDispose.family((ref, DateTimeRange range) => ref.watch(servicesProvider).getPetugasLaporanPenjualan(range));
+
+// Katalog
+var futureGetKatalogItem = FutureProvider.family((ref, store_id) => ref.watch(servicesProvider).getKatalogItem(store_id));

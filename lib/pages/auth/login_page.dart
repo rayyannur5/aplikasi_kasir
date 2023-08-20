@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
           pushAndRemoveUntil(context, const DashboardPage());
         } else {
           if (response['data'][0]['active'] == '1') {
-            pushAndRemoveUntil(context, KatalogPage());
+            pushAndRemoveUntil(context, KatalogPage(role: 'user'));
           } else {
             pushAndRemoveUntil(context, const NotVerifiedPage());
           }

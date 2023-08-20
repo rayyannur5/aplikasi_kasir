@@ -84,7 +84,7 @@ class DrawerAdmin extends StatelessWidget {
             tileColor: active == 2 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.local_mall_outlined, color: Colors.white),
             title: Text('Katalog', style: TextStyles.pBoldLight),
-            onTap: () => navigate(context, 2, KatalogPage()),
+            onTap: () => navigate(context, 2, KatalogPage(role: 'admin')),
           ),
           ExpansionTile(
             collapsedBackgroundColor: active >= 3 && active <= 7 ? Colors.white.withOpacity(0.2) : Colors.transparent,

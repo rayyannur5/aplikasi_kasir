@@ -88,7 +88,7 @@ class Local {
   static userLogout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     await setLogin(false);
-    await pref.remove('user_nama');
+    await pref.remove('user_name');
     await pref.remove('user_email');
     await pref.remove('user_role');
     await pref.remove('user_phone');

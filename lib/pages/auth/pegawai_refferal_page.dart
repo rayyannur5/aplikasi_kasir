@@ -38,9 +38,8 @@ class InputKodeRefferalPage extends StatelessWidget {
                         setstate(() {
                           _isLoading = false;
                         });
-                        print(res);
                         if (res['success']) {
-                          pushAndRemoveUntil(context, KatalogPage());
+                          pushAndRemoveUntil(context, KatalogPage(role: 'user'));
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res['errors'])));
                         }

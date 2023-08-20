@@ -72,7 +72,7 @@ class CreateAbsensiPage extends StatelessWidget {
   Padding pilihShift() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: FutureBuilder<List<Map<dynamic, dynamic>>>(
+      child: FutureBuilder(
         future: Services().getShift(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Shimmer.fromColors(baseColor: Colors.transparent, highlightColor: Colors.white.withOpacity(0.5), child: const TextField());

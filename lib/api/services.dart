@@ -17,6 +17,7 @@ class Services {
       var resp = await dio.post(Uri.encodeFull('/auth/login.php'), data: FormData.fromMap({'email': email, 'password': password}));
       if (resp.data['success']) {
         await Local.setUserData(resp.data['data'][0]);
+        await Local.setReceiptData(resp.data['data'][0]);
         await Local.setLogin(true);
       }
       return resp.data;
@@ -25,14 +26,18 @@ class Services {
     }
   }
 
-  static Future<Map> getUserInformation() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return {
-      'nama': 'Rayyan Nur Fauzan',
-      'email': 'rayyannur5@gmail.com',
-      'role': 'admin',
-      'phone': '6285215955155',
-    };
+  static Future getUserInformation() async {
+    try {
+      var userData = await Local.getUserData();
+      var resp = await dio.post(Uri.encodeFull('/auth/user.php'), data: FormData.fromMap({'email': userData['user_email']}));
+      if (resp.data['success']) {
+        await Local.setUserData(resp.data['data'][0]);
+        await Local.setReceiptData(resp.data['data'][0]);
+      }
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
   }
 
   static createTransactions(data) async {
@@ -130,16 +135,6 @@ class Services {
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
     }
-  }
-
-  static addShift(nama, start, end) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return true;
-  }
-
-  static updateShift(nama, start, end) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return true;
   }
 
   register() async {
@@ -257,6 +252,42 @@ class Services {
     }
   }
 
+  Future getShift() async {
+    try {
+      var userData = await Local.getUserData();
+      var res = await dio.get('/admin/shifts/get.php', queryParameters: {'admin_id': userData['user_id']});
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static updateShift(id, time, shift) async {
+    try {
+      if (shift == 1) {
+        var resp = await dio.post('/admin/shifts/update.php/$id', data: FormData.fromMap({'time_s1': time}));
+        return resp.data;
+      } else if (shift == 2) {
+        var resp = await dio.post('/admin/shifts/update.php/$id', data: FormData.fromMap({'time_s2': time}));
+        return resp.data;
+      } else {
+        var resp = await dio.post('/admin/shifts/update.php/$id', data: FormData.fromMap({'time_s3': time}));
+        return resp.data;
+      }
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getKatalogItem(store_id) async {
+    try {
+      var resp = await dio.get('/katalog/product/get.php?store_id=$store_id');
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
   Future<int> getCountDeviceTransactions() async {
     await Future.delayed(const Duration(seconds: 1));
     return Random().nextInt(1000);
@@ -328,31 +359,6 @@ class Services {
       {
         'id': '3',
         'nama': 'Lain - lain',
-      },
-    ];
-    return hasil;
-  }
-
-  Future<List<Map>> getShift() async {
-    await Future.delayed(const Duration(seconds: 1));
-    List<Map> hasil = [
-      {
-        'id': '1',
-        'nama': 'Shift 1',
-        'start': '00:00',
-        'end': '09:59',
-      },
-      {
-        'id': '2',
-        'nama': 'Shift 2',
-        'start': '10:00',
-        'end': '15:59',
-      },
-      {
-        'id': '3',
-        'nama': 'Shift 3',
-        'start': '16:00',
-        'end': '21:59',
       },
     ];
     return hasil;
