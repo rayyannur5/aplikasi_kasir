@@ -14,12 +14,6 @@ var priceProvider = StateProvider.autoDispose((ref) => 0);
 var amountProvider = StateProvider.autoDispose((ref) => 0);
 
 // DASHBOARD
-var futureDeviceCountTransactionsProvider = FutureProvider((ref) => ref.watch(servicesProvider).getCountDeviceTransactions());
-var futureCashierCountTransactionsProvider = FutureProvider((ref) => ref.watch(servicesProvider).getCountCashierTransactions());
-var futureOpenedOutletsProvider = FutureProvider((ref) => ref.watch(servicesProvider).getOpenedOutlets());
-var futureActivedEmployeesProvider = FutureProvider((ref) => ref.watch(servicesProvider).getActivedEmployees());
-var futureOmsetComparisonProvider = FutureProvider((ref) => ref.watch(servicesProvider).getOmsetComparison());
-var futureChartTodayTransactionsProvider = FutureProvider((ref) => ref.watch(servicesProvider).getChartTodayTransactions());
 
 // MANAJEMEN LAYANAN
 var futureGetItemsProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getItems());
@@ -45,23 +39,11 @@ var parameterReportAIProvider = StateProvider(
 );
 
 // Laporan Transaksi Admin
-var futureYearGetTransactionProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getYearReportTransaction());
-var futureMonthGetTransactionProvider = FutureProvider.autoDispose.family((ref, String year) => ref.watch(servicesProvider).getMonthReportTransaction(year));
-var futureDayGetTransactionProvider = FutureProvider.autoDispose.family((ref, String month) => ref.watch(servicesProvider).getDayReportTransaction(month));
-var futureHourGetTransactionProvider = FutureProvider.autoDispose.family((ref, String day) => ref.watch(servicesProvider).getHourReportTransaction(day));
 
 // Laporan Perbandingan
-var futurePerbandinganReportProvider = FutureProvider.autoDispose.family((ref, Map parameter) => ref.watch(servicesProvider).getPerbandinganReport(parameter));
-var parameterPerbandinganReportProvider = StateProvider(
-  (ref) => {
-    'date': DateTimeRange(start: DateTime.now(), end: DateTime.now()),
-    'outlet_id': '1',
-  },
-);
 
 // Petugas Laporan Penjualan
 var parameterPetugasLaporanPenjualan = StateProvider((ref) => DateTimeRange(start: DateTime.now(), end: DateTime.now()));
 var futurePetugasLaporanPenjualan = FutureProvider.autoDispose.family((ref, DateTimeRange range) => ref.watch(servicesProvider).getPetugasLaporanPenjualan(range));
 
 // Katalog
-var futureGetKatalogItem = FutureProvider.family((ref, store_id) => ref.watch(servicesProvider).getKatalogItem(store_id));

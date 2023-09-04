@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:aplikasi_kasir/api/local.dart';
+import 'package:aplikasi_kasir/api/user_information.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
@@ -6,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:lottie/lottie.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'pages/auth/not_verified_page.dart';
 
 void main() async {
   // runApp(MyApp());
@@ -68,21 +74,35 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: FutureBuilder(
-          future: Local.getLogin(),
+          future: getUserInformationAndLogin(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) return Center(child: LottieBuilder.asset('assets/lotties/loading.json'));
             if (snapshot.data!['value']) {
-              if (snapshot.data!['role'] == 'admin') {
+              if (snapshot.data!['data'][0]['role'] == 'admin') {
                 return const DashboardPage();
               } else {
-                return Builder(builder: (context) {
-                  return KatalogPage(role: 'user');
-                });
+                if (snapshot.data!['data'][0]['active'] == '0') {
+                  return NotVerifiedPage();
+                }
+                return KatalogPage(role: 'user');
               }
             } else {
               return const OnBoardingPage();
             }
           }),
     );
+  }
+
+  Future getUserInformationAndLogin() async {
+    var tempDir = await getTemporaryDirectory();
+
+    final dir = Directory(tempDir.path);
+    dir.deleteSync(recursive: true);
+
+    await UserInformation.delete();
+    var login = await Local.getLogin();
+    var userInformation = await UserInformation.get();
+    userInformation['value'] = login['value'];
+    return userInformation;
   }
 }

@@ -1,30 +1,27 @@
 import 'package:aplikasi_kasir/api/services.dart';
-import 'package:aplikasi_kasir/pages/admin_laporan/laporan_petugas/detail_laporan_petugas_page.dart';
-import 'package:aplikasi_kasir/utils/formatter.dart';
-import 'package:aplikasi_kasir/utils/navigator.dart';
+import 'package:aplikasi_kasir/widgets/admin_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../utils/textstyles.dart';
-import '../../../widgets/admin_drawer.dart';
 
-class LaporanPetugasPage extends StatefulWidget {
-  const LaporanPetugasPage({super.key});
+class LaporanTambahanPetugasPage extends StatefulWidget {
+  const LaporanTambahanPetugasPage({super.key});
 
   @override
-  State<LaporanPetugasPage> createState() => _LaporanPetugasPageState();
+  State<LaporanTambahanPetugasPage> createState() => _LaporanTambahanPetugasPageState();
 }
 
-class _LaporanPetugasPageState extends State<LaporanPetugasPage> {
+class _LaporanTambahanPetugasPageState extends State<LaporanTambahanPetugasPage> {
   DateTimeRange range = DateTimeRange(start: DateTime.now(), end: DateTime.now());
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: const Text('Laporan Absensi Petugas')),
-      drawer: DrawerAdmin(active: 11, size: size),
+      appBar: AppBar(title: Text('Laporan Tambahan Petugas')),
+      drawer: DrawerAdmin(size: size, active: 14),
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {});
@@ -74,7 +71,7 @@ class _LaporanPetugasPageState extends State<LaporanPetugasPage> {
             ),
             const SizedBox(height: 10),
             FutureBuilder(
-              future: Services.getLaporanPetugas(range),
+              future: Services.getAdminLaporanTambahan(range),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return ListView.builder(
@@ -84,55 +81,62 @@ class _LaporanPetugasPageState extends State<LaporanPetugasPage> {
                   );
                 } else if (!snapshot.data['success']) {
                   return ListView(
+                    shrinkWrap: true,
                     children: [
                       Image.asset('assets/images/error.png'),
                       Text(snapshot.data['errors']),
                     ],
                   );
-                }
-                List data = snapshot.data['data'];
-                if (data.isEmpty) {
-                  return ListView(
+                } else {
+                  List data = snapshot.data['data'];
+
+                  if (data.isEmpty) {
+                    return ListView(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      children: [
+                        Image.asset('assets/images/empty.png'),
+                      ],
+                    );
+                  }
+
+                  return ListView.builder(
                     shrinkWrap: true,
-                    children: [
-                      Image.asset('assets/images/empty.png'),
-                    ],
-                  );
-                }
-                return ListView.builder(
-                  itemCount: data.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) => Card(
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      title: Text("${data[index]['store']} | ${data[index]['pegawai']}"),
-                      subtitle: Text(
-                          "Absen Masuk : ${DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at']))}\nAbsen Keluar : ${data[index]['created_at'] == data[index]['updated_at'] ? 'Belum Absen Keluar' : DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['updated_at']))}",
-                          style: const TextStyle(fontSize: 10)),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: data.length,
+                    itemBuilder: (context, index) => Card(
+                      child: Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(color: const Color(0xff3943B7), borderRadius: BorderRadius.circular(10)),
-                            child: Text(data[index]['status'] == '1' ? 'Tepat Waktu' : 'Terlambat', style: const TextStyle(color: Colors.white)),
+                          Expanded(
+                            flex: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(data[index]['name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                                  Text(DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at'])), style: TextStyle(fontSize: 10)),
+                                  Text(data[index]['addr'], maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9)),
+                                  const SizedBox(height: 10),
+                                  Text(data[index]['description']),
+                                ],
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(color: const Color(0xff159600), borderRadius: BorderRadius.circular(10)),
-                            child: Text(numberFormat.format(int.parse(data[index]['omset'])), style: const TextStyle(color: Colors.white)),
-                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(8),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(data[index]['image']),
+                              ),
+                            ),
+                          )
                         ],
                       ),
-                      onTap: () async {
-                        await Future.delayed(const Duration(milliseconds: 200));
-                        push(context, DetailLaporanPetugasPage(data: data[index]));
-                      },
                     ),
-                  ),
-                );
+                  );
+                }
               },
             ),
           ],

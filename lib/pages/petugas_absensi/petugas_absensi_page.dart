@@ -30,12 +30,21 @@ class PetugasAbsensiPage extends StatelessWidget {
   }
 
   StatefulBuilder pageBody(DateTimeRange range) {
-    return StatefulBuilder(builder: (context, setstate) {
-      return FutureBuilder(
-          future: Services().getLaporanPetugas(range),
+    return StatefulBuilder(
+      builder: (context, setstate) {
+        return FutureBuilder(
+          future: Services.getLaporanPetugas(range),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) return Center(child: LottieBuilder.asset('assets/lotties/loading.json'));
-            List data = snapshot.data!;
+            if (!snapshot.data['success']) {
+              return Column(
+                children: [
+                  Image.asset('assets/images/error.png'),
+                  Text(snapshot.data['errors']),
+                ],
+              );
+            }
+            List data = snapshot.data!['data'];
             if (data.isEmpty) {
               return RefreshIndicator(
                 onRefresh: () async {
@@ -61,37 +70,40 @@ class PetugasAbsensiPage extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 itemCount: data.length,
                 itemBuilder: (context, index) => Card(
-                    child: ListTile(
-                  onTap: () async {
-                    await Future.delayed(const Duration(milliseconds: 200));
-                    push(context, DetailLaporanPetugasPage(data: data[index]));
-                  },
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  title: Text(
-                      'Masuk : ${DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at']))}\nKeluar :${data[index]['created_at'] == data[index]['updated_at'] ? 'Belum Absen Keluar' : (DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['updated_at'])))}',
-                      style: const TextStyle(fontSize: 14)),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(color: const Color(0xff3943B7), borderRadius: BorderRadius.circular(10)),
-                        child: Text('Shift ${data[index]['shift']}', style: const TextStyle(color: Colors.white)),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(color: const Color(0xff159600), borderRadius: BorderRadius.circular(10)),
-                        child: Text(data[index]['keterangan'], style: const TextStyle(color: Colors.white)),
-                      ),
-                    ],
+                  child: ListTile(
+                    onTap: () async {
+                      await Future.delayed(const Duration(milliseconds: 200));
+                      push(context, DetailLaporanPetugasPage(data: data[index]));
+                    },
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    title: Text(
+                        'Masuk : ${DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at']))}\nKeluar :${data[index]['created_at'] == data[index]['updated_at'] ? 'Belum Absen Keluar' : (DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['updated_at'])))}',
+                        style: const TextStyle(fontSize: 12)),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(color: const Color(0xff3943B7), borderRadius: BorderRadius.circular(10)),
+                          child: Text('Shift ${data[index]['shift']}', style: const TextStyle(color: Colors.white)),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(color: data[index]['status'] == '1' ? const Color(0xff159600) : Colors.red, borderRadius: BorderRadius.circular(10)),
+                          child: Text(data[index]['status'] == '1' ? 'Tepat Waktu' : 'Terlambat', style: const TextStyle(color: Colors.white)),
+                        ),
+                      ],
+                    ),
                   ),
-                )),
+                ),
               ),
             );
-          });
-    });
+          },
+        );
+      },
+    );
   }
 
   AppBar appBar(BuildContext context) {
@@ -110,10 +122,18 @@ class PetugasAbsensiPage extends StatelessWidget {
                 color: const Color(0xff449DD1),
               ),
               child: FutureBuilder(
-                future: Services().getLaporanPetugas(DateTimeRange(start: DateTime.now(), end: DateTime.now())),
+                future: Services.getLaporanPetugas(DateTimeRange(start: DateTime.now(), end: DateTime.now())),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CupertinoActivityIndicator(color: Colors.white));
-                  List data = snapshot.data!;
+                  if (!snapshot.data['success']) {
+                    return Column(
+                      children: [
+                        Image.asset('assets/images/error.png'),
+                        Text(snapshot.data['errors']),
+                      ],
+                    );
+                  }
+                  List data = snapshot.data['data'];
                   if (data.isEmpty) {
                     return Row(
                       children: [
@@ -156,7 +176,7 @@ class PetugasAbsensiPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data.last['created_at'])), style: const TextStyle(fontSize: 16, color: Colors.white)),
+                              Text(DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data.last['created_at'])), style: const TextStyle(fontSize: 16, color: Colors.white)),
                               ElevatedButton(
                                   onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => materialPush(context, const CameraAbsensiPage())),
                                   style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff78C0E0))),
@@ -186,7 +206,7 @@ class PetugasAbsensiPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data.last['updated_at'])), style: const TextStyle(fontSize: 16, color: Colors.white)),
+                            Text(DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data.last['updated_at'])), style: const TextStyle(fontSize: 16, color: Colors.white)),
                             ElevatedButton(
                                 onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, DetailLaporanPetugasPage(data: data.last))),
                                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff78C0E0))),
@@ -201,6 +221,7 @@ class PetugasAbsensiPage extends StatelessWidget {
             ),
             const TabBar(
               labelColor: Colors.white,
+              unselectedLabelColor: Colors.grey,
               tabs: [
                 Tab(text: 'Hari Ini'),
                 Tab(text: '1 Minggu'),

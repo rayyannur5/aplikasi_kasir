@@ -1,4 +1,5 @@
 import 'package:aplikasi_kasir/api/services.dart';
+import 'package:aplikasi_kasir/pages/auth/not_verified_page.dart';
 import 'package:aplikasi_kasir/pages/auth/qr_scan_refferal_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
@@ -39,7 +40,7 @@ class InputKodeRefferalPage extends StatelessWidget {
                           _isLoading = false;
                         });
                         if (res['success']) {
-                          pushAndRemoveUntil(context, KatalogPage(role: 'user'));
+                          pushAndRemoveUntil(context, NotVerifiedPage());
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res['errors'])));
                         }

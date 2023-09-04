@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:aplikasi_kasir/api/local.dart';
+import 'package:aplikasi_kasir/api/user_information.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_ai_device_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_perbandingan_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_petugas/laporan_petugas_page.dart';
+import 'package:aplikasi_kasir/pages/admin_laporan/laporan_petugas/laporan_tambahan_petugas_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_year_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_city_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_layanan_page.dart';
@@ -15,6 +19,7 @@ import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../utils/textstyles.dart';
 
@@ -130,7 +135,7 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 8 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Ringkasan AI Device', style: TextStyles.pLight),
-                onTap: () => navigate(context, 8, const LaporanAIDevicePage()),
+                onTap: () => navigate(context, 8, LaporanAIDevicePage()),
               ),
               ListTile(
                 tileColor: active == 9 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -140,12 +145,17 @@ class DrawerAdmin extends StatelessWidget {
               ListTile(
                 tileColor: active == 10 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Laporan Perbandingan', style: TextStyles.pLight),
-                onTap: () => navigate(context, 10, const LaporanPerbandinganPage()),
+                onTap: () => navigate(context, 10, LaporanPerbandinganPage()),
               ),
               ListTile(
                 tileColor: active == 11 ? Colors.white.withOpacity(0.2) : Colors.transparent,
-                title: Text('Laporan Petugas', style: TextStyles.pLight),
+                title: Text('Laporan Absensi Petugas', style: TextStyles.pLight),
                 onTap: () => navigate(context, 11, const LaporanPetugasPage()),
+              ),
+              ListTile(
+                tileColor: active == 14 ? Colors.white.withOpacity(0.2) : Colors.transparent,
+                title: Text('Laporan Petugas', style: TextStyles.pLight),
+                onTap: () => navigate(context, 14, const LaporanTambahanPetugasPage()),
               ),
             ],
           ),
@@ -153,7 +163,7 @@ class DrawerAdmin extends StatelessWidget {
             tileColor: active == 12 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.account_circle_outlined, color: Colors.white),
             title: Text('Profil Pengguna', style: TextStyles.pBoldLight),
-            onTap: () => navigate(context, 12, const ProfilPenggunaPage()),
+            onTap: () => navigate(context, 12, ProfilPenggunaPage()),
           ),
           ListTile(
             tileColor: active == 13 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -169,6 +179,11 @@ class DrawerAdmin extends StatelessWidget {
                   actions: [
                     TextButton(
                         onPressed: () async {
+                          var tempDir = await getTemporaryDirectory();
+
+                          final dir = Directory(tempDir.path);
+                          dir.deleteSync(recursive: true);
+                          await UserInformation.delete();
                           var resp = await Local.userLogout();
                           if (resp) {
                             pushAndRemoveUntil(context, const OnBoardingPage());

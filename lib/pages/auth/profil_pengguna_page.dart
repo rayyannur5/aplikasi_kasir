@@ -1,12 +1,21 @@
+import 'dart:io';
+
 import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/api/services.dart';
+import 'package:aplikasi_kasir/api/user_information.dart';
+import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/widgets/admin_drawer.dart';
 import 'package:aplikasi_kasir/widgets/petugas_drawer.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'onboarding_page.dart';
 
 class ProfilPenggunaPage extends StatelessWidget {
-  const ProfilPenggunaPage({super.key});
+  ProfilPenggunaPage({super.key});
+  bool isKirim = false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +34,20 @@ class ProfilPenggunaPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: FutureBuilder(
-            future: Services.getUserInformation(),
+            future: UserInformation.get(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) return Center(child: LottieBuilder.asset('assets/lotties/loading.json'));
-              var data = snapshot.data!;
+              var data = snapshot.data!['data'][0];
               return Column(
                 children: [
                   TextFormField(
                     readOnly: true,
-                    controller: TextEditingController(text: data['nama']),
+                    controller: TextEditingController(text: data['name']),
                     decoration: InputDecoration(
                         labelText: 'Nama',
                         suffixIcon: IconButton(
                             onPressed: () {
+                              var name = TextEditingController(text: data['name']);
                               showModalBottomSheet(
                                 context: context,
                                 builder: (context) => Padding(
@@ -46,11 +56,48 @@ class ProfilPenggunaPage extends StatelessWidget {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       TextField(
-                                        controller: TextEditingController(text: data['nama']),
+                                        controller: name,
                                         decoration: const InputDecoration(labelText: 'Nama'),
                                       ),
                                       const SizedBox(height: 20),
-                                      ElevatedButton(onPressed: () {}, child: const Text('Simpan')),
+                                      StatefulBuilder(builder: (context, setstate) {
+                                        return ElevatedButton(
+                                            onPressed: isKirim
+                                                ? null
+                                                : () async {
+                                                    if (name.text.isEmpty) {
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (context) => CupertinoAlertDialog(
+                                                          content: Text('Nama harus diisi'),
+                                                          actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))],
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+                                                    setstate(() => isKirim = false);
+                                                    var response = await Services.updateName(name.text);
+                                                    if (response['success']) {
+                                                      await UserInformation.delete();
+                                                      pushAndRemoveUntil(context, ProfilPenggunaPage());
+                                                    } else {
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (context) => CupertinoAlertDialog(
+                                                          content: Column(
+                                                            children: [
+                                                              Image.asset('assets/images/error.png', scale: 2),
+                                                              Text(response['errors']),
+                                                            ],
+                                                          ),
+                                                          actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))],
+                                                        ),
+                                                      );
+                                                      setstate(() => isKirim = false);
+                                                    }
+                                                  },
+                                            child: isKirim ? const CupertinoActivityIndicator(color: Colors.white) : const Text('Simpan'));
+                                      }),
                                       const SizedBox(height: 20),
                                     ],
                                   ),
@@ -85,6 +132,9 @@ class ProfilPenggunaPage extends StatelessWidget {
                         labelText: 'Password',
                         suffixIcon: IconButton(
                             onPressed: () {
+                              var passwordlama = TextEditingController();
+                              var passwordBaru = TextEditingController();
+                              var passwordBaruUlang = TextEditingController();
                               showModalBottomSheet(
                                 context: context,
                                 builder: (context) => Padding(
@@ -92,25 +142,70 @@ class ProfilPenggunaPage extends StatelessWidget {
                                   child: ListView(
                                     shrinkWrap: true,
                                     children: [
-                                      const TextField(
-                                        // controller: TextEditingController(text: data['nama']),
+                                      TextField(
+                                        controller: passwordlama,
                                         obscureText: true,
                                         decoration: InputDecoration(labelText: 'Password Lama'),
                                       ),
                                       const SizedBox(height: 20),
-                                      const TextField(
-                                        // controller: TextEditingController(text: data['nama']),
+                                      TextField(
+                                        controller: passwordBaru,
                                         obscureText: true,
                                         decoration: InputDecoration(labelText: 'Password Baru'),
                                       ),
                                       const SizedBox(height: 20),
-                                      const TextField(
-                                        // controller: TextEditingController(text: data['nama']),
+                                      TextField(
+                                        controller: passwordBaruUlang,
                                         obscureText: true,
                                         decoration: InputDecoration(labelText: 'Ketik Ulang Password Baru'),
                                       ),
                                       const SizedBox(height: 20),
-                                      ElevatedButton(onPressed: () {}, child: const Text('Simpan')),
+                                      StatefulBuilder(builder: (context, setstate) {
+                                        return ElevatedButton(
+                                            onPressed: isKirim
+                                                ? null
+                                                : () async {
+                                                    if (passwordBaru.text.isEmpty || passwordlama.text.isEmpty || passwordBaruUlang.text.isEmpty) {
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (context) => CupertinoAlertDialog(
+                                                          content: Text('Semua kolom harus diisi'),
+                                                          actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))],
+                                                        ),
+                                                      );
+                                                      return;
+                                                    } else if (passwordBaru.text != passwordBaruUlang.text) {
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (context) => CupertinoAlertDialog(
+                                                          content: Text('Ketik ulang password salah'),
+                                                          actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))],
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+                                                    setstate(() => isKirim = true);
+                                                    var response = await Services.updatePassword(passwordlama.text, passwordBaru.text);
+                                                    if (response['success']) {
+                                                      pushAndRemoveUntil(context, ProfilPenggunaPage());
+                                                    } else {
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (context) => CupertinoAlertDialog(
+                                                          content: Column(
+                                                            children: [
+                                                              Image.asset('assets/images/error.png', scale: 2),
+                                                              Text(response['errors']),
+                                                            ],
+                                                          ),
+                                                          actions: [TextButton(onPressed: () => pop(context), child: Text('Ok'))],
+                                                        ),
+                                                      );
+                                                      setstate(() => isKirim = false);
+                                                    }
+                                                  },
+                                            child: isKirim ? const CupertinoActivityIndicator(color: Colors.white) : const Text('Simpan'));
+                                      }),
                                       const SizedBox(height: 20),
                                     ],
                                   ),
@@ -120,7 +215,35 @@ class ProfilPenggunaPage extends StatelessWidget {
                             icon: const Icon(Icons.edit))),
                   ),
                   const Spacer(),
-                  ElevatedButton(onPressed: () {}, child: const Text('Logout')),
+                  ElevatedButton(
+                      onPressed: () {
+                        showCupertinoDialog(
+                          context: context,
+                          builder: (context) => CupertinoAlertDialog(
+                            title: const Text('Logout'),
+                            content: const Text('Apakah anda yakin untuk logout?'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () async {
+                                    var tempDir = await getTemporaryDirectory();
+
+                                    final dir = Directory(tempDir.path);
+                                    dir.deleteSync(recursive: true);
+                                    await UserInformation.delete();
+                                    var resp = await Local.userLogout();
+                                    if (resp) {
+                                      pushAndRemoveUntil(context, const OnBoardingPage());
+                                    } else {
+                                      pop(context);
+                                    }
+                                  },
+                                  child: const Text('Logout')),
+                              TextButton(onPressed: () => pop(context), child: const Text('Batal'))
+                            ],
+                          ),
+                        );
+                      },
+                      child: const Text('Logout')),
                 ],
               );
             }),

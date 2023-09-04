@@ -39,7 +39,7 @@ class Local {
   static Future<Map> getLogin() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     return {
-      'value': pref.getBool('is_login'),
+      'value': pref.getBool('is_login') ?? false,
       'role': pref.getString('user_role'),
     };
   }

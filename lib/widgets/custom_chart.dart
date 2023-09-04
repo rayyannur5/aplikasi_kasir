@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 class CustomChart extends StatelessWidget {
   const CustomChart({super.key, required this.data});
-  final List<double> data;
+  final List data;
 
   double datamax() {
     double maks = 0;
     for (var element in data) {
       if (element > maks) {
-        maks = element;
+        maks = element.toDouble();
       }
     }
     return maks;
@@ -30,7 +30,7 @@ class CustomChart extends StatelessWidget {
             titlesData: const FlTitlesData(topTitles: AxisTitles(), rightTitles: AxisTitles(axisNameWidget: SizedBox())),
             lineBarsData: [
               LineChartBarData(
-                spots: data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(),
+                spots: data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value.toDouble())).toList(),
                 // isCurved: true,
                 dotData: const FlDotData(show: false),
                 belowBarData: BarAreaData(show: true, gradient: const LinearGradient(colors: [Colors.blue, Colors.white], begin: Alignment.topCenter, end: Alignment.bottomCenter)),

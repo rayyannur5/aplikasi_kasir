@@ -1,13 +1,10 @@
-import 'package:aplikasi_kasir/api/providers.dart';
-import 'package:aplikasi_kasir/api/services.dart';
+import 'package:aplikasi_kasir/api/local.dart';
+import 'package:aplikasi_kasir/api/trolly.dart';
 import 'package:aplikasi_kasir/pages/katalog/sukses_pembayaran_page.dart';
 import 'package:aplikasi_kasir/utils/formatter.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/utils/textstyles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lottie/lottie.dart';
 
 // ignore: must_be_immutable
 class PembayaranPage extends StatelessWidget {
@@ -16,7 +13,7 @@ class PembayaranPage extends StatelessWidget {
   final List items;
   final int price;
   final ValueNotifier<int> updateAmount = ValueNotifier(0);
-
+  var platController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -44,6 +41,11 @@ class PembayaranPage extends StatelessWidget {
               ],
             ),
             const Spacer(),
+            TextField(
+              controller: platController,
+              decoration: InputDecoration(labelText: 'Plat Pelanggan', fillColor: Colors.transparent, border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))),
+            ),
+            const SizedBox(height: 5),
             Container(
                 width: size.width,
                 height: 50,
@@ -289,14 +291,8 @@ class PembayaranPage extends StatelessWidget {
                 ),
                 FloatingActionButton(
                   onPressed: () async {
-                    showCupertinoDialog(
-                      context: context,
-                      builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'),
-                    );
-                    var resp = await Services.createTransactions("data");
-                    if (resp) {
-                      pushAndRemoveUntil(context, const SuksesPembayaranPage());
-                    }
+                    await pushDataTRX();
+                    pushAndRemoveUntil(context, const SuksesPembayaranPage());
                   },
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
@@ -308,5 +304,29 @@ class PembayaranPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future pushDataTRX() async {
+    var userData = await Local.getUserData();
+    var date = DateTime.now();
+    int idUser1000 = 1000 + int.parse(userData['user_id']);
+
+    var year = date.year.toString();
+    var month = date.month < 10 ? '0${date.month.toString()}' : date.month.toString();
+    var day = date.day < 10 ? '0${date.day.toString()}' : date.day.toString();
+    var hour = date.hour < 10 ? '0${date.hour.toString()}' : date.hour.toString();
+    var minute = date.minute < 10 ? '0${date.minute.toString()}' : date.minute.toString();
+    var second = date.second < 10 ? '0${date.second.toString()}' : date.second.toString();
+
+    var idTrx = idUser1000.toString() + year + month + day + hour + minute + second;
+    var idFinal = 'TRX-$idTrx';
+
+    Map newData = {
+      'trx_id': idFinal,
+      'store_id': storeId,
+      'customer': platController.text,
+      'data': items,
+    };
+    await Trolly.push(newData);
   }
 }

@@ -44,7 +44,7 @@ dependencies:
   share_plus: ^7.0.2
   mobile_scanner: ^3.3.0
   blue_thermal_printer: ^1.2.3
-  flutter_osm_plugin: ^0.55.3
+  flutter_osm_plugin: ^0.60.4
   geolocator: ^9.0.2
   shared_preferences: ^2.2.0
   camera: ^0.10.5+2

@@ -1,6 +1,7 @@
 import 'package:aplikasi_kasir/api/services.dart';
 import 'package:aplikasi_kasir/widgets/petugas_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../utils/formatter.dart';
@@ -38,6 +39,8 @@ class PetugasLaporanPenjualanPage extends StatelessWidget {
       title: const Text('Laporan Penjualan'),
       bottom: TabBar(
         labelColor: Colors.white,
+        indicatorColor: Colors.white,
+        unselectedLabelColor: Colors.grey,
         onTap: (value) {
           if (value == 0) {}
         },
@@ -79,7 +82,12 @@ class PetugasLaporanPenjualanPage extends StatelessWidget {
               ],
             );
           }
-          List data = snapshot.data!;
+          if (!snapshot.data['success']) {
+            return Column(
+              children: [Image.asset('assets/images/error.png'), Text(snapshot.data['errors'])],
+            );
+          }
+          List data = snapshot.data['data'];
           if (data.isEmpty) {
             return RefreshIndicator(
               onRefresh: () async {
@@ -93,8 +101,8 @@ class PetugasLaporanPenjualanPage extends StatelessWidget {
           List<Map> dataGrafik = [];
           for (var element in data) {
             dataGrafik.add({
-              'label': element['jam'],
-              'value': element['amount'],
+              'label': element['created_at'],
+              'value': int.parse(element['paid']),
             });
           }
           return Column(
@@ -114,17 +122,17 @@ class PetugasLaporanPenjualanPage extends StatelessWidget {
                     itemCount: data.length,
                     itemBuilder: (context, index) => Card(
                       child: ListTile(
-                        title: Text(data[index]['jam'], style: TextStyles.h2),
-                        subtitle: Text(data[index]['outlet_nama']),
+                        title: Text(DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at'])), style: TextStyles.h2),
+                        subtitle: Text(data[index]['store']),
                         trailing: Container(
                           height: double.infinity,
                           width: 100,
                           padding: const EdgeInsets.all(10),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(color: Theme.of(context).primaryColor, borderRadius: BorderRadius.circular(10)),
-                          child: Text(numberFormat.format(data[index]['amount']), style: TextStyles.h2Light),
+                          child: Text(numberFormat.format(int.parse(data[index]['paid'])), style: TextStyles.h2Light),
                         ),
-                        onTap: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, DeetailTransaksi(id: data[index]['id']))),
+                        onTap: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, DetailTransaksi(id: data[index]['id']))),
                       ),
                     ),
                   ),

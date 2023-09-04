@@ -6,15 +6,15 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
-class DeetailTransaksi extends StatefulWidget {
-  const DeetailTransaksi({super.key, required this.id});
+class DetailTransaksi extends StatefulWidget {
+  const DetailTransaksi({super.key, required this.id});
   final String id;
 
   @override
-  State<DeetailTransaksi> createState() => _DeetailTransaksiState();
+  State<DetailTransaksi> createState() => _DetailTransaksiState();
 }
 
-class _DeetailTransaksiState extends State<DeetailTransaksi> {
+class _DetailTransaksiState extends State<DetailTransaksi> {
   List<BluetoothDevice> devices = [];
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
@@ -54,11 +54,21 @@ class _DeetailTransaksiState extends State<DeetailTransaksi> {
                       color: Colors.white,
                     ));
               }
-              data = snapshot.data;
+              if (!snapshot.data['success']) {
+                return Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Image.asset('assets/images/error.png'),
+                      Text(snapshot.data['errors']),
+                    ],
+                  ),
+                );
+              }
+              data = snapshot.data['data'][0];
               int total = 0;
-              for (int i = 0; i < data['data'].length; i++) {
-                int temp = int.parse(data['data'][i]['item_count']) * int.parse(data['data'][i]['item_harga']);
-                total = total + temp;
+              for (int i = 0; i < data['items'].length; i++) {
+                total = total + int.parse(data['items'][i]['price']);
               }
               return Container(
                 height: size.height / 1.5,
@@ -70,29 +80,35 @@ class _DeetailTransaksiState extends State<DeetailTransaksi> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Align(alignment: Alignment.center, child: Image.asset('assets/images/logo-black.png')),
-                    Align(alignment: Alignment.center, child: Text(data['outlet_nama'], style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    Align(alignment: Alignment.center, child: Text(data['store'], style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    Align(alignment: Alignment.center, child: Text(data['receipt_brand'], textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    Align(alignment: Alignment.center, child: Text(data['receipt_phone'], textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
                     Align(
                         alignment: Alignment.center,
-                        child: Text(DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data['created_at'])), style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                        child:
+                            Text(DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data['created_at'])), style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
                     const SizedBox(height: 20),
-                    Text("Kasir : ${data['user_nama']}", style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
-                    Text("ID    : ${data['id']}", style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
-                    const Align(alignment: Alignment.center, child: Text("--------------------------------------", maxLines: 1, style: TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
-                    for (int i = 0; i < data['data'].length; i++)
+                    Text("Kasir     : ${data['pegawai_name']}", style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
+                    Text("Pelanggan : ${data['customer']}", style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
+                    const Align(
+                        alignment: Alignment.center, child: Text("--------------------------------------", maxLines: 1, style: TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    for (int i = 0; i < data['items'].length; i++)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("${data['data'][i]['item_count']}x ${data['data'][i]['item_nama']}", style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
-                          Text(numberFormat.format(int.parse(data['data'][i]['item_harga']) * int.parse(data['data'][i]['item_count'])),
-                              style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
+                          Text("${data['items'][i]['qty']}x ${data['items'][i]['product_name']}", style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
+                          Text(numberFormat.format(int.parse(data['items'][i]['price'])), style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold)),
                         ],
                       ),
-                    const Align(alignment: Alignment.center, child: Text("--------------------------------------", maxLines: 1, style: TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    const Align(
+                        alignment: Alignment.center, child: Text("--------------------------------------", maxLines: 1, style: TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
                     const Align(alignment: Alignment.center, child: Text('TOTAL', style: TextStyle(fontFamily: 'SpaceMono', fontSize: 20))),
                     Align(alignment: Alignment.center, child: Text(numberFormat.format(total), style: const TextStyle(fontFamily: 'SpaceMono', fontSize: 20, fontWeight: FontWeight.bold))),
-                    const Align(alignment: Alignment.center, child: Text("--------------------------------------", maxLines: 1, style: TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    const Align(
+                        alignment: Alignment.center, child: Text("--------------------------------------", maxLines: 1, style: TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
                     const SizedBox(height: 20),
-                    Align(alignment: Alignment.center, child: Text(data['outlet_pesan'], textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    Align(alignment: Alignment.center, child: Text(data['receipt_message'], textAlign: TextAlign.center, style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
+                    Align(alignment: Alignment.center, child: Text(data['trx_id'], style: const TextStyle(fontFamily: 'SpaceMono', fontWeight: FontWeight.bold))),
                   ],
                 ),
               );
@@ -162,7 +178,6 @@ class _DeetailTransaksiState extends State<DeetailTransaksi> {
                             for (int i = namaProduk.length; i < 21; i++) {
                               namaProduk += ' ';
                             }
-                            print(namaProduk);
                           } else if (namaProduk.length > 21) {
                             namaProduk = namaProduk.substring(0, 21);
                           }

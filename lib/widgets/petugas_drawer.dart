@@ -1,9 +1,14 @@
+import 'dart:io';
+
+import 'package:aplikasi_kasir/api/user_information.dart';
 import 'package:aplikasi_kasir/pages/petugas_absensi/petugas_absensi_page.dart';
 import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_absensi_page.dart';
 import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_penjualan_page.dart';
 import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_setoran_page.dart';
+import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_tambahan_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../api/local.dart';
 import '../pages/auth/onboarding_page.dart';
@@ -54,7 +59,7 @@ class DrawerPetugas extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          data['user_name'],
+                          data['user_name'].length > 15 ? data['user_name'].toString().substring(0, 15) + ".." : data['user_name'],
                           style: TextStyles.h2Light,
                         ),
                         Text(
@@ -65,7 +70,7 @@ class DrawerPetugas extends StatelessWidget {
                     );
                   }),
               const Spacer(),
-              IconButton(onPressed: () => navigate(context, 6, const ProfilPenggunaPage()), icon: const Icon(Icons.navigate_next, color: Colors.white)),
+              IconButton(onPressed: () => navigate(context, 6, ProfilPenggunaPage()), icon: const Icon(Icons.navigate_next, color: Colors.white)),
             ],
           )),
           ListTile(
@@ -102,13 +107,18 @@ class DrawerPetugas extends StatelessWidget {
                 title: Text('Laporan Setoran', style: TextStyles.pLight),
                 onTap: () => navigate(context, 5, PetugasLaporanSetoranPage()),
               ),
+              ListTile(
+                tileColor: active == 8 ? Colors.white.withOpacity(0.2) : Colors.transparent,
+                title: Text('Laporan Tambahan', style: TextStyles.pLight),
+                onTap: () => navigate(context, 8, PetugasLaporanTambahanPage()),
+              ),
             ],
           ),
           ListTile(
             tileColor: active == 6 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.account_circle_outlined, color: Colors.white),
             title: Text('Profil Pengguna', style: TextStyles.pBoldLight),
-            onTap: () => navigate(context, 6, const ProfilPenggunaPage()),
+            onTap: () => navigate(context, 6, ProfilPenggunaPage()),
           ),
           ListTile(
             tileColor: active == 7 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -124,6 +134,11 @@ class DrawerPetugas extends StatelessWidget {
                   actions: [
                     TextButton(
                         onPressed: () async {
+                          var tempDir = await getTemporaryDirectory();
+
+                          final dir = Directory(tempDir.path);
+                          dir.deleteSync(recursive: true);
+                          await UserInformation.delete();
                           var resp = await Local.userLogout();
                           if (resp) {
                             pushAndRemoveUntil(context, const OnBoardingPage());

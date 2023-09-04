@@ -124,9 +124,7 @@ class _PickLoactionPageState extends State<PickLoactionPage> {
           ],
         ),
       ),
-      pickerConfig: const CustomPickerLocationConfig(
-        initZoom: 18,
-      ),
+      pickerConfig: const CustomPickerLocationConfig(zoomOption: ZoomOption(initZoom: 20)),
     );
   }
 }
