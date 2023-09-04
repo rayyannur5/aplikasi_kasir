@@ -1,9 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:aplikasi_kasir/api/local.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 
 class Services {
   static final dio = Dio(
@@ -41,8 +44,18 @@ class Services {
   }
 
   static createTransactions(data) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return true;
+    try {
+      var userData = await Local.getUserData();
+      if (userData['user_role'] == 'admin') {
+        var res = await dio.post('/katalog/transactions/createadmin.php', data: FormData.fromMap({'data': jsonEncode(data)}));
+        return res.data;
+      } else {
+        var res = await dio.post('/katalog/transactions/create.php', data: FormData.fromMap({'pegawai_id': userData['user_id'], 'data': jsonEncode(data)}));
+        return res.data;
+      }
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
   }
 
   // MANAJEMEN LAYANAN
@@ -279,9 +292,18 @@ class Services {
     }
   }
 
-  Future getKatalogItem(store_id) async {
+  Future getKatalogItem(storeId) async {
     try {
-      var resp = await dio.get('/katalog/product/get.php?store_id=$store_id');
+      var resp = await dio.get('/katalog/product/get.php?store_id=$storeId');
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future detailAbsensi(id) async {
+    try {
+      var resp = await dio.get('/pegawai/laporan/absensi_detail.php/$id');
       return resp.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -506,6 +528,13 @@ class Services {
   }
 
   Future getDetailTransaction(String id) async {
+    try {
+      var res = await dio.get('/pegawai/laporan/penjualan_detail.php/$id');
+      return res.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+
     await Future.delayed(const Duration(seconds: 1));
     return {
       'id': '1',
@@ -560,110 +589,180 @@ class Services {
     ];
   }
 
-  Future getLaporanPetugas(DateTimeRange range) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    // return [];
-    return [
-      {
-        'user_id': '1',
-        'user_nama': 'Budi Santoso',
-        'created_at': '2023-07-14 23:48:00',
-        'updated_at': '2023-07-14 24:00:00',
-        'image_in': 'https://picsum.photos/200/300',
-        'image_out': 'https://picsum.photos/200/300',
-        'lat_in': '-7.31686186932247',
-        'lon_in': '112.72543698655583',
-        'addr_in': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
-        'lat_out': '-7.316906755372916',
-        'lon_out': '112.72549852076374',
-        'addr_out': 'MPMG+75M, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231',
-        'omset': '1000000',
-        'shift': '2',
-        'keterangan': 'Tepat Waktu',
-      },
-    ];
-  }
-
-  Future<List> getPetugasLaporanPenjualan(DateTimeRange range) async {
-    await Future.delayed(const Duration(seconds: 1));
-    if (DateFormat('y-MM-d HH:m').format(range.start) == DateFormat('y-MM-d HH:m').format(range.end)) {
-      return [
-        {
-          'id': '1',
-          'jam': '12:00',
-          'amount': 10000,
-          'outlet_nama': 'Outlet 1',
-        },
-        {
-          'id': '2',
-          'jam': '13:00',
-          'amount': 10000,
-          'outlet_nama': 'Outlet 1',
-        },
-      ];
-    } else {
-      return [
-        {
-          'id': '1',
-          'jam': '12:00',
-          'amount': 10000,
-          'outlet_nama': 'Outlet 1',
-        },
-        {
-          'id': '2',
-          'jam': '13:00',
-          'amount': 10000,
-          'outlet_nama': 'Outlet 1',
-        },
-        {
-          'id': '3',
-          'jam': '23:00',
-          'amount': 10000,
-          'outlet_nama': 'Outlet 1',
-        },
-        {
-          'id': '4',
-          'jam': '23:50',
-          'amount': 10000,
-          'outlet_nama': 'Outlet 1',
-        },
-      ];
+  static Future createAttendances(File image_in, String store_id, int shfit, double lat_in, double lon_in, range_in) async {
+    try {
+      String fileName = basename(image_in.path);
+      var userData = await Local.getUserData();
+      FormData formData = FormData.fromMap({
+        'pegawai_id': userData['user_id'],
+        "image_in": await MultipartFile.fromFile(image_in.path, filename: fileName),
+        'store_id': store_id,
+        'shift': shfit,
+        'lat_in': lat_in,
+        'lon_in': lon_in,
+        'range_in': range_in,
+      });
+      var response = await dio.post("/pegawai/attendances/create.php", data: formData);
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
     }
   }
 
-  Future<int> getTabungan() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return 100000;
+  static Future updateAttendances(File image_in, double lat_in, double lon_in, range_in) async {
+    try {
+      String fileName = basename(image_in.path);
+      var userData = await Local.getUserData();
+      FormData formData = FormData.fromMap({
+        'pegawai_id': userData['user_id'],
+        "image_out": await MultipartFile.fromFile(image_in.path, filename: fileName),
+        'lat_out': lat_in,
+        'lon_out': lon_in,
+        'range_out': range_in,
+      });
+      var response = await dio.post("/pegawai/attendances/update.php", data: formData);
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
   }
 
-  Future<List<Map>> getListSetoran(DateTimeRange range) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return [
-      {
-        'date': '2023-07-14 23:48:00',
-        'total': '100000',
-      },
-      {
-        'date': '2023-07-14 23:48:00',
-        'total': '100000',
-      },
-      {
-        'date': '2023-07-14 23:48:00',
-        'total': '100000',
-      },
-      {
-        'date': '2023-07-14 23:48:00',
-        'total': '100000',
-      },
-      {
-        'date': '2023-07-14 23:48:00',
-        'total': '100000',
-      },
-      {
-        'date': '2023-07-14 23:48:00',
-        'total': '100000',
-      },
-    ];
+  static Future getOneStore(storeId) async {
+    try {
+      var response = await dio.get("/pegawai/stores/get_one.php/$storeId");
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getLaporanPetugas(DateTimeRange range) async {
+    try {
+      var userData = await Local.getUserData();
+      var resp = await dio.get('/pegawai/attendances/get.php', queryParameters: {
+        'pegawai_id': userData['user_id'],
+        'start_date': range.start.toString().substring(0, 10),
+        'end_date': range.end.toString().substring(0, 10),
+      });
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getPetugasLaporanPenjualan(DateTimeRange range) async {
+    try {
+      var userData = await Local.getUserData();
+      var resp = await dio.get('/pegawai/laporan/penjualan.php', queryParameters: {
+        'pegawai_id': userData['user_id'],
+        'start_date': range.start.toString().substring(0, 10),
+        'end_date': range.end.toString().substring(0, 10),
+      });
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getTabungan() async {
+    try {
+      var userData = await Local.getUserData();
+      var resp = await dio.get('/pegawai/laporan/tabungan.php', queryParameters: {
+        'pegawai_id': userData['user_id'],
+      });
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  Future getListSetoran(DateTimeRange range) async {
+    try {
+      var userData = await Local.getUserData();
+      var resp = await dio.get('/pegawai/laporan/setoran.php', queryParameters: {
+        'pegawai_id': userData['user_id'],
+        'start_date': range.start.toString().substring(0, 10),
+        'end_date': range.end.toString().substring(0, 10),
+      });
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future getPetugasLaporanTambahan() async {
+    try {
+      var userData = await Local.getUserData();
+      var resp = await dio.get('/pegawai/laporan/laporan_tambahan_get.php', queryParameters: {
+        'pegawai_id': userData['user_id'],
+      });
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future getLaporanKategori() async {
+    try {
+      var resp = await dio.get('/pegawai/laporan/laporan_kategori_get.php');
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future createLaporanTambahan(String imagePath, double lat, double lon, range, reportCategoryId, desc) async {
+    try {
+      String fileName = basename(imagePath);
+      var userData = await Local.getUserData();
+      FormData formData = FormData.fromMap({
+        'pegawai_id': userData['user_id'],
+        "image": await MultipartFile.fromFile(imagePath, filename: fileName),
+        'lat': lat,
+        'lon': lon,
+        'range': range,
+        'report_category_id': reportCategoryId,
+        'description': desc
+      });
+      var response = await dio.post("/pegawai/laporan/laporan_tambahan_create.php", data: formData);
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future updateName(name) async {
+    try {
+      var userData = await Local.getUserData();
+      if (userData['user_role'] == 'admin') {
+      } else {
+        FormData formData = FormData.fromMap({
+          'pegawai_id': userData['user_id'],
+          "name": name,
+        });
+        var response = await dio.post("/pegawai/auth/update_name.php", data: formData);
+        return response.data;
+      }
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future updatePassword(passwordlama, passwordbaru) async {
+    try {
+      var userData = await Local.getUserData();
+      if (userData['user_role'] == 'admin') {
+      } else {
+        FormData formData = FormData.fromMap({
+          'pegawai_id': userData['user_id'],
+          "password_lama": passwordlama,
+          "password_baru": passwordbaru,
+        });
+        var response = await dio.post("/pegawai/auth/update_password.php", data: formData);
+        return response.data;
+      }
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
   }
 }

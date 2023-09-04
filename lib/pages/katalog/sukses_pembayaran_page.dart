@@ -20,7 +20,7 @@ class SuksesPembayaranPage extends StatelessWidget {
             LottieBuilder.asset('assets/lotties/success.json'),
             const Spacer(),
             ElevatedButton(
-                onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, const DeetailTransaksi(id: '1'))),
+                onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, const DetailTransaksi(id: '1'))),
                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0xff449DD1))),
                 child: const Text('Cetak')),
             const SizedBox(height: 10),

@@ -37,6 +37,7 @@ class PetugasLaporanAbsensiPage extends StatelessWidget {
       title: const Text('Laporan Absensi'),
       bottom: const TabBar(
         labelColor: Colors.white,
+        unselectedLabelColor: Colors.grey,
         tabs: [
           Tab(text: 'Hari Ini'),
           Tab(text: '1 Minggu'),
@@ -75,7 +76,15 @@ class PetugasLaporanAbsensiPage extends StatelessWidget {
               ],
             );
           }
-          List data = snapshot.data!;
+          if (!snapshot.data['success']) {
+            return Column(
+              children: [
+                Image.asset('assets/images/error.png'),
+                Text(snapshot.data['errors']),
+              ],
+            );
+          }
+          List data = snapshot.data['data'];
           if (data.isEmpty) {
             return RefreshIndicator(
               onRefresh: () async {
@@ -88,7 +97,7 @@ class PetugasLaporanAbsensiPage extends StatelessWidget {
           }
           int countTepatWaktu = 0;
           for (var element in data) {
-            if (element['keterangan'] == 'Tepat Waktu') {
+            if (element['status'] == '1') {
               countTepatWaktu++;
             }
           }
@@ -129,8 +138,8 @@ class PetugasLaporanAbsensiPage extends StatelessWidget {
                       },
                       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                       title: Text(
-                          'Masuk : ${DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at']))}\nKeluar :${data[index]['created_at'] == data[index]['updated_at'] ? 'Belum Absen Keluar' : (DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['updated_at'])))}',
-                          style: const TextStyle(fontSize: 14)),
+                          'Masuk : ${DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at']))}\nKeluar :${data[index]['created_at'] == data[index]['updated_at'] ? 'Belum Absen Keluar' : (DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['updated_at'])))}',
+                          style: const TextStyle(fontSize: 12)),
                       trailing: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -143,8 +152,8 @@ class PetugasLaporanAbsensiPage extends StatelessWidget {
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(color: const Color(0xff159600), borderRadius: BorderRadius.circular(10)),
-                            child: Text(data[index]['keterangan'], style: const TextStyle(color: Colors.white)),
+                            decoration: BoxDecoration(color: data[index]['status'] == '1' ? const Color(0xff159600) : Colors.red, borderRadius: BorderRadius.circular(10)),
+                            child: Text(data[index]['status'] == '1' ? 'Tepat Waktu' : 'Terlambat', style: const TextStyle(color: Colors.white)),
                           ),
                         ],
                       ),

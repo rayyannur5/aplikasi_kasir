@@ -52,7 +52,7 @@ class AdminLaporanTransaksiJamPage extends ConsumerWidget {
                             decoration: BoxDecoration(color: Theme.of(context).primaryColor, borderRadius: BorderRadius.circular(10)),
                             child: Text(numberFormat.format(data[index]['amount']), style: TextStyles.h2Light),
                           ),
-                          onTap: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, DeetailTransaksi(id: data[index]['id']))),
+                          onTap: () => Future.delayed(const Duration(milliseconds: 200), () => push(context, DetailTransaksi(id: data[index]['id']))),
                         ),
                       ),
                     ),

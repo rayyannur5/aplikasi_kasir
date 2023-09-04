@@ -1,4 +1,5 @@
 import 'package:aplikasi_kasir/api/local.dart';
+import 'package:aplikasi_kasir/api/user_information.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_ai_device_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_perbandingan_page.dart';
@@ -144,6 +145,11 @@ class DrawerAdmin extends StatelessWidget {
               ),
               ListTile(
                 tileColor: active == 11 ? Colors.white.withOpacity(0.2) : Colors.transparent,
+                title: Text('Laporan Absensi Petugas', style: TextStyles.pLight),
+                onTap: () => navigate(context, 11, const LaporanPetugasPage()),
+              ),
+              ListTile(
+                tileColor: active == 11 ? Colors.white.withOpacity(0.2) : Colors.transparent,
                 title: Text('Laporan Petugas', style: TextStyles.pLight),
                 onTap: () => navigate(context, 11, const LaporanPetugasPage()),
               ),
@@ -153,7 +159,7 @@ class DrawerAdmin extends StatelessWidget {
             tileColor: active == 12 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.account_circle_outlined, color: Colors.white),
             title: Text('Profil Pengguna', style: TextStyles.pBoldLight),
-            onTap: () => navigate(context, 12, const ProfilPenggunaPage()),
+            onTap: () => navigate(context, 12, ProfilPenggunaPage()),
           ),
           ListTile(
             tileColor: active == 13 ? Colors.white.withOpacity(0.2) : Colors.transparent,
@@ -169,6 +175,7 @@ class DrawerAdmin extends StatelessWidget {
                   actions: [
                     TextButton(
                         onPressed: () async {
+                          await UserInformation.delete();
                           var resp = await Local.userLogout();
                           if (resp) {
                             pushAndRemoveUntil(context, const OnBoardingPage());

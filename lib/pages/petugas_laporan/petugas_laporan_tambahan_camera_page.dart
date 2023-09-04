@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/pages/petugas_absensi/create_absensi_page.dart';
+import 'package:aplikasi_kasir/pages/petugas_laporan/petugas_laporan_tambahan_create_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,26 +10,21 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:lottie/lottie.dart';
 
-class CameraAbsensiPage extends StatefulWidget {
-  const CameraAbsensiPage({super.key});
+class PetugasLaporanTambahanCameraPage extends StatefulWidget {
+  const PetugasLaporanTambahanCameraPage({super.key});
 
   @override
-  State<CameraAbsensiPage> createState() => _CameraAbsensiPageState();
+  State<PetugasLaporanTambahanCameraPage> createState() => _PetugasLaporanTambahanCameraPageState();
 }
 
-class _CameraAbsensiPageState extends State<CameraAbsensiPage> {
+class _PetugasLaporanTambahanCameraPageState extends State<PetugasLaporanTambahanCameraPage> {
   late CameraController controller;
+  int switchCamera = 0;
 
   Future<void> initializeCamera() async {
     var cameras = await availableCameras();
-    controller = CameraController(cameras[1], ResolutionPreset.low);
+    controller = CameraController(cameras[switchCamera], ResolutionPreset.low);
     await controller.initialize();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 
   File changeFileNameOnlySync(File file, String newFileName) {
@@ -49,6 +45,19 @@ class _CameraAbsensiPageState extends State<CameraAbsensiPage> {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
+      await showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          content: Text('Hidupkan Lokasi Perangkat'),
+          actions: [
+            TextButton(
+              onPressed: () => pop(context),
+              child: Text('Ok'),
+            ),
+          ],
+        ),
+      );
+      pop(context);
       return Future.error('Location services are disabled.');
     }
 
@@ -61,16 +70,48 @@ class _CameraAbsensiPageState extends State<CameraAbsensiPage> {
         // Android's shouldShowRequestPermissionRationale
         // returned true. According to Android guidelines
         // your App should show an explanatory UI now.
+        await showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            content: Text('Aplikasi Perlu Mendapatkan Izin Lokasi'),
+            actions: [
+              TextButton(
+                onPressed: () => pop(context),
+                child: Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        pop(context);
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
+      await showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          content: Text('Aplikasi Perlu Mendapatkan Izin Lokasi'),
+          actions: [
+            TextButton(
+              onPressed: () => pop(context),
+              child: Text('Ok'),
+            ),
+          ],
+        ),
+      );
+      pop(context);
       return Future.error('Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,13 +123,13 @@ class _CameraAbsensiPageState extends State<CameraAbsensiPage> {
           // height: size.height - 100,
           // width: size.width,
 
-              child : FutureBuilder(
-                future: initializeCamera(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) return SizedBox(height: size.height/2, child: LottieBuilder.asset('assets/lotties/loading.json'));
-                  return CameraPreview(controller);
-                },
-              ),
+          child: FutureBuilder(
+            future: initializeCamera(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) return SizedBox(height: size.height / 2, child: LottieBuilder.asset('assets/lotties/loading.json'));
+              return CameraPreview(controller);
+            },
+          ),
         ),
         const Spacer(),
         SizedBox(
@@ -96,7 +137,8 @@ class _CameraAbsensiPageState extends State<CameraAbsensiPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              FloatingActionButton(onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), heroTag: 'close', backgroundColor: Colors.red, child: const Icon(Icons.close)),
+              FloatingActionButton(
+                  onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), heroTag: 'close', backgroundColor: Colors.red, child: const Icon(Icons.close)),
               FutureBuilder<Position>(
                   future: getPosition(),
                   builder: (context, snapshot) {
@@ -121,12 +163,25 @@ class _CameraAbsensiPageState extends State<CameraAbsensiPage> {
 
                           File newImage = changeFileNameOnlySync(File(image.path), namaGambar);
 
-                          pushReplacement(context, CreateAbsensiPage(imagePath: newImage.path, position: snapshot.data!));
+                          pushReplacement(context, PetugasLaporanTambahanCreatePage(imagePath: newImage.path, position: snapshot.data!));
                         },
                         heroTag: 'camera',
                         child: const Icon(Icons.camera));
                   }),
-              const SizedBox(width: 60),
+              FloatingActionButton(
+                onPressed: () {
+                  if (switchCamera == 1) {
+                    setState(() {
+                      switchCamera = 0;
+                    });
+                  } else {
+                    setState(() {
+                      switchCamera = 1;
+                    });
+                  }
+                },
+                child: Icon(Icons.cameraswitch),
+              ),
             ],
           ),
         )

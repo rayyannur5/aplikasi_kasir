@@ -33,9 +33,10 @@ class PetugasLaporanSetoranPage extends StatelessWidget {
 
   AppBar appBar() {
     return AppBar(
-      title: const Text('Laporan Absensi'),
+      title: const Text('Laporan Setoran'),
       bottom: const TabBar(
         labelColor: Colors.white,
+        unselectedLabelColor: Colors.grey,
         tabs: [
           Tab(text: 'Hari Ini'),
           Tab(text: '1 Minggu'),
@@ -72,7 +73,7 @@ class PetugasLaporanSetoranPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Jumlah uang yang belum disetorkan', style: TextStyle(color: Colors.white)),
-                    Text(numberFormat.format(snapshot.data), style: TextStyles.h1Light),
+                    Text(!snapshot.data['success'] ? 'Error, Refresh Kembali' : numberFormat.format(snapshot.data['data']), style: TextStyles.h1Light),
                   ],
                 ),
               );
@@ -87,14 +88,33 @@ class PetugasLaporanSetoranPage extends StatelessWidget {
                     highlightColor: Colors.white.withOpacity(0.5),
                     child: Container(height: 50, width: size.width, margin: const EdgeInsets.all(20), color: Colors.black));
               }
-              List data = snapshot.data!;
+              if (!snapshot.data['success']) {
+                return SizedBox(
+                  height: size.height - appBar().preferredSize.height - statusBarHeight - 120,
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {});
+                    },
+                    child: ListView(
+                      children: [
+                        Image.asset('assets/images/error.png'),
+                        Text(snapshot.data['errors']),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              List data = snapshot.data!['data'];
               if (data.isEmpty) {
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    setState(() {});
-                  },
-                  child: ListView(
-                    children: [Image.asset('assets/images/empty.png')],
+                return SizedBox(
+                  height: size.height - appBar().preferredSize.height - statusBarHeight - 120,
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {});
+                    },
+                    child: ListView(
+                      children: [Image.asset('assets/images/empty.png')],
+                    ),
                   ),
                 );
               }
@@ -109,11 +129,11 @@ class PetugasLaporanSetoranPage extends StatelessWidget {
                     itemCount: data.length,
                     itemBuilder: (context, index) => Card(
                         child: ListTile(
-                            title: Text(DateFormat("H:m, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['date']))),
+                            title: Text(DateFormat("HH:mm, d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['created_at']))),
                             trailing: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(color: const Color(0xff449DD1), borderRadius: BorderRadius.circular(10)),
-                              child: Text(numberFormat.format(int.parse(data[index]['total'])), style: const TextStyle(color: Colors.white)),
+                              child: Text(numberFormat.format(int.parse(data[index]['total_setor'])), style: const TextStyle(color: Colors.white)),
                             ))),
                   ),
                 ),
