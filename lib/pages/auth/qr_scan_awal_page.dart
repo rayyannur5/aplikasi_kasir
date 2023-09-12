@@ -20,7 +20,10 @@ class ScanQRAwalPage extends StatelessWidget {
         children: [
           const SizedBox(width: 20),
           FloatingActionButton(
-              onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), backgroundColor: Colors.red, foregroundColor: Colors.white, child: const Icon(Icons.close)),
+              onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)),
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.close)),
           const SizedBox(width: 20),
           Expanded(
               child: ElevatedButton(
@@ -42,8 +45,8 @@ class ScanQRAwalPage extends StatelessWidget {
               // final Uint8List? image = capture.image;
               cameraController.stop();
               showCupertinoDialog(context: context, builder: (context) => LottieBuilder.asset('assets/lotties/loading.json'));
-              var resp = await Services().checkDevice(barcodes.first.rawValue);
-              if (resp != null) {
+              Map resp = await Services().checkDevice(barcodes.first.rawValue);
+              if (resp['success']) {
                 pop(context);
                 await Local.setRegisterMode('admin');
                 pushReplacement(context, TakePhotoPage(dataDevice: resp));
@@ -51,7 +54,8 @@ class ScanQRAwalPage extends StatelessWidget {
                 pop(context);
                 await showCupertinoDialog(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(content: const Text('Device Tidak Valid'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
+                    builder: (context) => CupertinoAlertDialog(
+                        content: Text(resp['errors'].toString()), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
                 cameraController.start();
               }
             },

@@ -51,7 +51,8 @@ class Services {
         var res = await dio.post('/katalog/transactions/createadmin.php', data: FormData.fromMap({'data': jsonEncode(data)}));
         return res.data;
       } else {
-        var res = await dio.post('/katalog/transactions/create.php', data: FormData.fromMap({'pegawai_id': userData['user_id'], 'data': jsonEncode(data)}));
+        var res =
+            await dio.post('/katalog/transactions/create.php', data: FormData.fromMap({'pegawai_id': userData['user_id'], 'data': jsonEncode(data)}));
         return res.data;
       }
     } catch (e) {
@@ -73,7 +74,8 @@ class Services {
   static addItems(icon, name) async {
     try {
       Map<String, dynamic> userData = await Local.getUserData();
-      var res = await dio.post(Uri.encodeFull("/admin/products/create.php"), data: FormData.fromMap({'admin_id': userData['user_id'], 'icon': icon, 'name': name}));
+      var res = await dio.post(Uri.encodeFull("/admin/products/create.php"),
+          data: FormData.fromMap({'admin_id': userData['user_id'], 'icon': icon, 'name': name}));
       return res.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -126,7 +128,8 @@ class Services {
 
   static createPrice(storeId, productId, price) async {
     try {
-      var res = await dio.post(Uri.encodeFull("/admin/prices/create.php"), data: FormData.fromMap({'store_id': storeId, 'product_id': productId, 'price': price}));
+      var res = await dio.post(Uri.encodeFull("/admin/prices/create.php"),
+          data: FormData.fromMap({'store_id': storeId, 'product_id': productId, 'price': price}));
       return res.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -178,22 +181,17 @@ class Services {
     }
   }
 
-  checkDevice(id) async {
-    var resp = await dio.get(
-      Uri.encodeFull("/admin/devices/check.php"),
-      queryParameters: {
-        'device_id': id,
-      },
-    );
-
-    if (resp.data['success']) {
-      if (resp.data['data'][0]['id'] == id) {
-        return resp.data['data'][0];
-      } else {
-        return null;
-      }
-    } else {
-      return null;
+  Future<Map> checkDevice(id) async {
+    try {
+      var resp = await dio.get(
+        "/admin/devices/check.php",
+        queryParameters: {
+          'device_id': id,
+        },
+      );
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
     }
   }
 
@@ -422,7 +420,8 @@ class Services {
   static Future getDayReportTransaction(String month, String year) async {
     try {
       var userData = await Local.getUserData();
-      var response = await dio.get('/admin/laporan/transaksi_hari.php', queryParameters: {'admin_id': userData['user_id'], 'month': month, 'year': year});
+      var response =
+          await dio.get('/admin/laporan/transaksi_hari.php', queryParameters: {'admin_id': userData['user_id'], 'month': month, 'year': year});
       return response.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
