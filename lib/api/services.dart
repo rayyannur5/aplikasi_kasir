@@ -51,8 +51,7 @@ class Services {
         var res = await dio.post('/katalog/transactions/createadmin.php', data: FormData.fromMap({'data': jsonEncode(data)}));
         return res.data;
       } else {
-        var res =
-            await dio.post('/katalog/transactions/create.php', data: FormData.fromMap({'pegawai_id': userData['user_id'], 'data': jsonEncode(data)}));
+        var res = await dio.post('/katalog/transactions/create.php', data: FormData.fromMap({'pegawai_id': userData['user_id'], 'data': jsonEncode(data)}));
         return res.data;
       }
     } catch (e) {
@@ -74,8 +73,7 @@ class Services {
   static addItems(icon, name) async {
     try {
       Map<String, dynamic> userData = await Local.getUserData();
-      var res = await dio.post(Uri.encodeFull("/admin/products/create.php"),
-          data: FormData.fromMap({'admin_id': userData['user_id'], 'icon': icon, 'name': name}));
+      var res = await dio.post(Uri.encodeFull("/admin/products/create.php"), data: FormData.fromMap({'admin_id': userData['user_id'], 'icon': icon, 'name': name}));
       return res.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -117,6 +115,23 @@ class Services {
     }
   }
 
+  Future getOutletOpen() async {
+    try {
+      var userData = await Local.getUserData();
+      var loginData = await Local.getLogin();
+
+      if (loginData['role'] == 'admin') {
+        var res = await dio.get(Uri.encodeFull("/admin/stores/get_open.php"), queryParameters: {'admin_id': userData['user_id']});
+        return res.data;
+      } else {
+        var res = await dio.get(Uri.encodeFull("/pegawai/stores/get.php"), queryParameters: {'pegawai_id': userData['user_id']});
+        return res.data;
+      }
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
   Future getPrices(storeId) async {
     try {
       var res = await dio.get(Uri.encodeFull("/admin/prices/get.php"), queryParameters: {'store_id': storeId});
@@ -128,8 +143,7 @@ class Services {
 
   static createPrice(storeId, productId, price) async {
     try {
-      var res = await dio.post(Uri.encodeFull("/admin/prices/create.php"),
-          data: FormData.fromMap({'store_id': storeId, 'product_id': productId, 'price': price}));
+      var res = await dio.post(Uri.encodeFull("/admin/prices/create.php"), data: FormData.fromMap({'store_id': storeId, 'product_id': productId, 'price': price}));
       return res.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -368,33 +382,13 @@ class Services {
     }
   }
 
-  Future<Map> getAIDevice(Map data) async {
-    // String formattedBeginDate = DateFormat('yyyy-MM-dd').format(data['date'].start);
-    // String formattedEndDate = DateFormat('yyyy-MM-dd').format(data['date'].end);
-    await Future.delayed(const Duration(seconds: 1));
-    Map hasil = {
-      'id': '1',
-      'data': {
-        'Tambah Angin Motor': 30,
-        'Isi Baru Motor': 20,
-        'Tambah Angin Mobil': 34,
-        'Isi Baru Mobil': 12,
-        'Pas Motor': 6,
-        'Pas Mobil': 6,
-        'Kurangi Motor': 0,
-        'Kurangi Mobil': 0,
-        'Pause Motor': 0,
-        'Pause Mobil': 0,
-        'Error Motor': 0,
-        'Error Mobil': 0,
-      },
-      'outlet_id': '1',
-      'outlet_nama': 'Outlet 1',
-      'device_id': 'XaXadd',
-      'device_nama': 'Perangkat SPBU Generator'
-    };
-
-    return hasil;
+  Future getAIDevice(DateTime date, storeId) async {
+    try {
+      var response = await dio.get('/admin/laporan/ai_device.php', queryParameters: {'date': date.toString().substring(0, 10), 'store_id': storeId});
+      return response.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
   }
 
   static Future getYearReportTransaction() async {
@@ -407,21 +401,28 @@ class Services {
     }
   }
 
-  static Future getMonthReportTransaction(String year) async {
+  static Future getMonthReportTransaction(DateTime date) async {
+    var startDate = date.subtract(Duration(days: 30));
+    var endDate = date;
+    print(startDate);
+    print(endDate);
     try {
       var userData = await Local.getUserData();
-      var response = await dio.get('/admin/laporan/transaksi_bulan.php', queryParameters: {'admin_id': userData['user_id'], 'year': year});
+      var response = await dio.get('/admin/laporan/transaksi_hari.php', queryParameters: {'admin_id': userData['user_id'], 'start': startDate.toString(), 'end': endDate.toString()});
       return response.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
     }
   }
 
-  static Future getDayReportTransaction(String month, String year) async {
+  static Future getDayReportTransaction(DateTime date) async {
+    var startDate = date.subtract(Duration(days: 7));
+    var endDate = date;
+    print(startDate);
+    print(endDate);
     try {
       var userData = await Local.getUserData();
-      var response =
-          await dio.get('/admin/laporan/transaksi_hari.php', queryParameters: {'admin_id': userData['user_id'], 'month': month, 'year': year});
+      var response = await dio.get('/admin/laporan/transaksi_hari.php', queryParameters: {'admin_id': userData['user_id'], 'start': startDate.toString(), 'end': endDate.toString()});
       return response.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -448,17 +449,14 @@ class Services {
     }
   }
 
-  static Future getPerbandinganReport(DateTimeRange date, selectedOutlet) async {
-    String formattedBeginDate = DateFormat('yyyy-MM-dd').format(date.start);
-    String formattedEndDate = DateFormat('yyyy-MM-dd').format(date.end);
-
+  static Future getPerbandinganReport(DateTime date, selectedOutlet, page) async {
     try {
       Map<String, dynamic> params = {
         'store_id': selectedOutlet,
-        'start_date': formattedBeginDate,
-        'end_date': formattedEndDate,
+        'date': date.toString(),
+        'page': page,
       };
-      var response = await dio.post("/admin/laporan/perbandingan.php", queryParameters: params);
+      var response = await dio.post("/admin/laporan/perbandingan_v2.php", queryParameters: params);
       return response.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};
@@ -664,6 +662,29 @@ class Services {
     }
   }
 
+  static Future updatePhotos(imagePath) async {
+    try {
+      var userData = await Local.getUserData();
+      if (userData['user_role'] == 'admin') {
+        FormData formData = FormData.fromMap({
+          'admin_id': userData['user_id'],
+          "profile_picture": await MultipartFile.fromFile(imagePath),
+        });
+        var response = await dio.post("/admin/auth/update_photos.php", data: formData);
+        return response.data;
+      } else {
+        FormData formData = FormData.fromMap({
+          'pegawai_id': userData['user_id'],
+          "profile_picture": await MultipartFile.fromFile(imagePath),
+        });
+        var response = await dio.post("/pegawai/auth/update_password.php", data: formData);
+        return response.data;
+      }
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
   static Future getAdminLaporanTambahan(DateTimeRange date) async {
     String formattedBeginDate = DateFormat('yyyy-MM-dd').format(date.start);
     String formattedEndDate = DateFormat('yyyy-MM-dd').format(date.end);
@@ -674,6 +695,48 @@ class Services {
         'start_date': formattedBeginDate,
         'end_date': formattedEndDate,
       });
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future getGrafikMesin(DateTime date, storeId) async {
+    try {
+      var resp = await dio.get('/admin/laporan/ai_grafik.php', queryParameters: {
+        'date': date.toString().substring(0, 10),
+        'store_id': storeId,
+      });
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future getDeviceRealtime(DateTime date, storeId, page) async {
+    print(date.toString());
+    try {
+      var resp = await dio.get('/admin/laporan/ai_realtime.php', queryParameters: {'date': date.toString(), 'store_id': storeId, 'page': page});
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future getSnapToken(storeId) async {
+    try {
+      var resp = await dio.post('/payment/request.php', data: FormData.fromMap({'store_id': storeId}));
+      return resp.data;
+    } catch (e) {
+      return {'success': false, 'errors': e.toString()};
+    }
+  }
+
+  static Future getPayments() async {
+    try {
+      var userData = await Local.getUserData();
+
+      var resp = await dio.post('/payment/get.php', queryParameters: {'admin_id': userData['user_id']});
       return resp.data;
     } catch (e) {
       return {'success': false, 'errors': e.toString()};

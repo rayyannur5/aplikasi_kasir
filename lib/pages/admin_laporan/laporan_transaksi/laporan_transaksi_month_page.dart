@@ -1,40 +1,28 @@
 import 'package:aplikasi_kasir/api/providers.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_day_page.dart';
+import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_hour_page.dart';
+import 'package:aplikasi_kasir/pages/print_page/detail_transaksi_page.dart';
 import 'package:aplikasi_kasir/utils/formatter.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:aplikasi_kasir/utils/textstyles.dart';
+import 'package:aplikasi_kasir/widgets/admin_drawer.dart';
 import 'package:aplikasi_kasir/widgets/custom_chart_with_label.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../api/services.dart';
 
 class AdminLaporanTransaksiBulanPage extends StatefulWidget {
-  final String year;
-  const AdminLaporanTransaksiBulanPage({super.key, required this.year});
+  const AdminLaporanTransaksiBulanPage({super.key});
 
   @override
   State<AdminLaporanTransaksiBulanPage> createState() => _AdminLaporanTransaksiBulanPageState();
 }
 
 class _AdminLaporanTransaksiBulanPageState extends State<AdminLaporanTransaksiBulanPage> {
-  @override
   Widget build(BuildContext context) {
-    Map bulan = {
-      '1': 'Januari ${widget.year}',
-      '2': 'Februari ${widget.year}',
-      '3': 'Maret ${widget.year}',
-      '4': 'April ${widget.year}',
-      '5': 'Mei ${widget.year}',
-      '6': 'Juni ${widget.year}',
-      '7': 'Juli ${widget.year}',
-      '8': 'Agustus ${widget.year}',
-      '9': 'September ${widget.year}',
-      '10': 'Oktober ${widget.year}',
-      '11': 'November ${widget.year}',
-      '12': 'Desember ${widget.year}',
-    };
     // var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(title: const Text("Ringkasan Transaksi")),
@@ -43,7 +31,7 @@ class _AdminLaporanTransaksiBulanPageState extends State<AdminLaporanTransaksiBu
           setState(() {});
         },
         child: FutureBuilder(
-          future: Services.getMonthReportTransaction(widget.year),
+          future: Services.getMonthReportTransaction(DateTime.now()),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: LottieBuilder.asset('assets/lotties/loading.json'));
@@ -59,7 +47,7 @@ class _AdminLaporanTransaksiBulanPageState extends State<AdminLaporanTransaksiBu
               List<Map> dataGrafik = [];
               for (var element in data) {
                 dataGrafik.add({
-                  'label': bulan[element['bulan']],
+                  'label': "  " + DateFormat("d MMMM yyyy", "id_ID").format(DateTime.parse(element['hari'])),
                   'value': int.parse(element['transaksi']),
                 });
               }
@@ -68,19 +56,22 @@ class _AdminLaporanTransaksiBulanPageState extends State<AdminLaporanTransaksiBu
                 padding: const EdgeInsets.all(20),
                 children: [
                   CustomChartWithLabel(data: dataGrafik),
+                  Divider(),
                   ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: data.length,
                     itemBuilder: (context, index) => Card(
+                      color: Colors.white,
                       child: ListTile(
-                        title: Text(bulan[data[index]['bulan']], style: TextStyles.h2),
+                        title: Text(DateFormat("d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['hari'])), style: TextStyles.h2),
                         subtitle: Text("${numberFormat.format(int.parse(data[index]['transaksi']))} Transaksi"),
+                        trailing: Icon(Icons.navigate_next),
                         onTap: () => Future.delayed(
                           const Duration(milliseconds: 200),
                           () => push(
                             context,
-                            AdminLaporanTransaksiHariPage(month: data[index]['bulan'], year: widget.year),
+                            AdminLaporanTransaksiJamPage(date: data[index]['hari']),
                           ),
                         ),
                       ),

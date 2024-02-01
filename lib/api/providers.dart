@@ -30,7 +30,7 @@ var futureGetShiftProvider = FutureProvider.autoDispose((ref) => ref.watch(servi
 var futureGetCitiesProvider = FutureProvider.autoDispose((ref) => ref.watch(servicesProvider).getCities());
 
 // Ringkasan AI Device
-var futureReportAIDeviceProvider = FutureProvider.autoDispose.family((ref, Map parameterReportAI) => ref.watch(servicesProvider).getAIDevice(parameterReportAI));
+// var futureReportAIDeviceProvider = FutureProvider.autoDispose.family((ref, Map parameterReportAI) => ref.watch(servicesProvider).getAIDevice(parameterReportAI));
 var parameterReportAIProvider = StateProvider(
   (ref) => {
     'date': DateTimeRange(start: DateTime.now(), end: DateTime.now()),

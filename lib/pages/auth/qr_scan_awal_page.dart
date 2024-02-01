@@ -20,17 +20,14 @@ class ScanQRAwalPage extends StatelessWidget {
         children: [
           const SizedBox(width: 20),
           FloatingActionButton(
-              onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)),
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              child: const Icon(Icons.close)),
+              onPressed: () => Future.delayed(const Duration(milliseconds: 200), () => pop(context)), backgroundColor: Colors.red, foregroundColor: Colors.white, child: const Icon(Icons.close)),
           const SizedBox(width: 20),
           Expanded(
               child: ElevatedButton(
                   onPressed: () async {
                     await Local.setRegisterMode('user');
                     await Future.delayed(const Duration(milliseconds: 200));
-                    pushReplacement(context, InputKodeRefferalPage());
+                    pushReplacement(context, TakePhotoPage(dataDevice: {}));
                   },
                   child: const Text("Daftar Sebagai Pegawai"))),
           const SizedBox(width: 20),
@@ -54,8 +51,7 @@ class ScanQRAwalPage extends StatelessWidget {
                 pop(context);
                 await showCupertinoDialog(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(
-                        content: Text(resp['errors'].toString()), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
+                    builder: (context) => CupertinoAlertDialog(content: Text(resp['errors'].toString()), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
                 cameraController.start();
               }
             },

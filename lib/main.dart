@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/api/user_information.dart';
+import 'package:aplikasi_kasir/pages/account_hold_page.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
@@ -103,6 +104,7 @@ class MyApp extends StatelessWidget {
     var login = await Local.getLogin();
     var userInformation = await UserInformation.get();
     userInformation['value'] = login['value'];
+
     return userInformation;
   }
 }

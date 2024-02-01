@@ -8,8 +8,10 @@ import 'package:aplikasi_kasir/widgets/admin_drawer.dart';
 import 'package:aplikasi_kasir/widgets/petugas_drawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'onboarding_page.dart';
 
@@ -40,6 +42,99 @@ class ProfilPenggunaPage extends StatelessWidget {
               var data = snapshot.data!['data'][0];
               return Column(
                 children: [
+                  SizedBox(
+                    height: 100,
+                    child: ClipOval(
+                      child: Image.network(data['profile_picture']),
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListTile(
+                                    title: const Text("Galeri"),
+                                    onTap: () async {
+                                      await Future.delayed(const Duration(milliseconds: 200));
+                                      final XFile? image = await picker.pickImage(source: ImageSource.gallery, maxHeight: 640, maxWidth: 480);
+                                      if (image != null) {
+                                        bool pressed = false;
+                                        showCupertinoDialog(
+                                          context: context,
+                                          builder: (context) => CupertinoAlertDialog(
+                                            title: Text('Preview Gambar'),
+                                            content: SizedBox(
+                                              height: 100,
+                                              child: Image.file(File(image.path)),
+                                            ),
+                                            actions: [
+                                              StatefulBuilder(builder: (context, setstate) {
+                                                return TextButton(
+                                                    onPressed: pressed
+                                                        ? null
+                                                        : () async {
+                                                            setstate(() => pressed = true);
+                                                            var res = await Services.updatePhotos(image.path);
+                                                            setstate(() => pressed = false);
+                                                            if (res['success']) {
+                                                              await UserInformation.delete();
+                                                              var pref = await SharedPreferences.getInstance();
+                                                              pref.setString('user_profile_picture', res['data']);
+                                                              pushAndRemoveUntil(context, ProfilPenggunaPage());
+                                                            } else {
+                                                              showCupertinoDialog(
+                                                                context: context,
+                                                                builder: (context) => CupertinoAlertDialog(
+                                                                  content: Text(res['errors']),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                      onPressed: () => pop(context),
+                                                                      child: Text('OK'),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              );
+                                                            }
+                                                          },
+                                                    child: pressed ? CupertinoActivityIndicator() : Text('Simpan'));
+                                              }),
+                                              TextButton(onPressed: () => pop(context), child: Text('Batal')),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    }),
+                                ListTile(
+                                    title: const Text("Kamera"),
+                                    onTap: () async {
+                                      await Future.delayed(const Duration(milliseconds: 200));
+                                      final XFile? image = await picker.pickImage(source: ImageSource.camera, maxHeight: 640, maxWidth: 480);
+                                      if (image != null) {
+                                        showCupertinoDialog(
+                                          context: context,
+                                          builder: (context) => CupertinoAlertDialog(
+                                            title: Text('Preview Gambar'),
+                                            content: SizedBox(
+                                              height: 100,
+                                              child: Image.file(File(image.path)),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text('Ubah Foto Profil')),
                   TextFormField(
                     readOnly: true,
                     controller: TextEditingController(text: data['name']),

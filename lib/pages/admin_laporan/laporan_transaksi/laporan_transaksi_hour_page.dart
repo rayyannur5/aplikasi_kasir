@@ -13,7 +13,9 @@ import '../../../utils/navigator.dart';
 
 class AdminLaporanTransaksiJamPage extends ConsumerWidget {
   final String date;
-  const AdminLaporanTransaksiJamPage({super.key, required this.date});
+  AdminLaporanTransaksiJamPage({super.key, required this.date}) {
+    print(date);
+  }
 
   @override
   Widget build(BuildContext context, ref) {

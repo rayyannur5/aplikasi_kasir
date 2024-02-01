@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:aplikasi_kasir/pages/auth/pegawai_refferal_page.dart';
 import 'package:aplikasi_kasir/pages/auth/register_brand_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin_manajemen/manajemen_add_outlet_page.dart';
@@ -81,7 +84,12 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                         await Future.delayed(const Duration(milliseconds: 200));
                         var pref = await SharedPreferences.getInstance();
                         await pref.setString('temp_register_profile_picture', path!);
-                        push(context, RegisterBrandPage(dataDevice: widget.dataDevice));
+
+                        if (pref.getString('register_mode') == 'admin') {
+                          push(context, AddOutletPage(dataDevice: widget.dataDevice));
+                        } else {
+                          push(context, InputKodeRefferalPage());
+                        }
                       },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith<Color>(
@@ -96,7 +104,25 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                 ),
                 child: const Text('Lanjutkan')),
             const SizedBox(height: 10),
-            TextButton(onPressed: () => push(context, AddOutletPage(dataDevice: widget.dataDevice)), child: const Text("Lewati")),
+            TextButton(
+                onPressed: () async {
+                  var pref = await SharedPreferences.getInstance();
+
+                  final byteData = await rootBundle.load('assets/images/profile.png');
+
+                  final file = File('${(await getTemporaryDirectory()).path}/profile.png');
+                  await file.create(recursive: true);
+                  await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+                  print(file.path);
+                  await pref.setString('temp_register_profile_picture', file.path);
+
+                  if (pref.getString('register_mode') == 'admin') {
+                    push(context, AddOutletPage(dataDevice: widget.dataDevice));
+                  } else {
+                    push(context, InputKodeRefferalPage());
+                  }
+                },
+                child: const Text("Lewati")),
           ],
         ),
       ),

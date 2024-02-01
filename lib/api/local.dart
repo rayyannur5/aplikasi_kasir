@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart';
 
 class Local {
 // REGISTER
@@ -14,6 +16,8 @@ class Local {
 
   static Future<Map<String, dynamic>> getRegisterData() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
+    var imagePath = await pref.getString('temp_register_profile_picture');
+    String fileName = basename(imagePath!);
     if (pref.getString('register_mode') == 'admin') {
       return {
         'name': pref.getString('temp_register_name'),
@@ -21,7 +25,7 @@ class Local {
         'phone': pref.getString('temp_register_phone'),
         'password': pref.getString('temp_register_password'),
         'city': pref.getString('temp_city'),
-        'profile_picture': 'https://picsum.photos/200/300',
+        'profile_picture': await MultipartFile.fromFile(imagePath, filename: fileName),
       };
     } else {
       return {
@@ -30,7 +34,7 @@ class Local {
         'phone': pref.getString('temp_register_phone'),
         'password': pref.getString('temp_register_password'),
         'refferal': pref.getString('temp_refferal'),
-        'profile_picture': 'https://picsum.photos/200/300',
+        'profile_picture': await MultipartFile.fromFile(imagePath, filename: fileName),
       };
     }
   }
@@ -58,6 +62,7 @@ class Local {
     await pref.setString('user_phone', data['phone']);
     await pref.setString('user_profile_picture', data['profile_picture']);
     await pref.setString('user_role', data['role']);
+    await pref.setString('user_active', data['active']);
   }
 
   static Future<Map<String, dynamic>> getUserData() async {
@@ -70,6 +75,7 @@ class Local {
       'user_profile_picture': pref.getString('user_profile_picture'),
       'user_phone': pref.getString('user_phone'),
       'user_role': pref.getString('user_role'),
+      'user_active': pref.getString('user_active')
     };
   }
 

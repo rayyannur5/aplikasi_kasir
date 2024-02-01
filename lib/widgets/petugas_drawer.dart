@@ -45,16 +45,16 @@ class DrawerPetugas extends StatelessWidget {
       child: ListView(
         children: [
           DrawerHeader(
-              child: Row(
-            // crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/logo.png', scale: 1.5),
-              FutureBuilder<Map>(
-                  future: Local.getUserData(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) return const SizedBox();
-                    var data = snapshot.data!;
-                    return Column(
+            child: FutureBuilder<Map>(
+              future: Local.getUserData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) return const SizedBox();
+                var data = snapshot.data!;
+                return Row(
+                  children: [
+                    SizedBox(height: 50, width: 50, child: ClipOval(child: Image.network(snapshot.data!['user_profile_picture'], scale: 1.5))),
+                    const SizedBox(width: 10),
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -67,12 +67,14 @@ class DrawerPetugas extends StatelessWidget {
                           style: TextStyles.pLight,
                         ),
                       ],
-                    );
-                  }),
-              const Spacer(),
-              IconButton(onPressed: () => navigate(context, 6, ProfilPenggunaPage()), icon: const Icon(Icons.navigate_next, color: Colors.white)),
-            ],
-          )),
+                    ),
+                    const Spacer(),
+                    IconButton(onPressed: () => navigate(context, 6, ProfilPenggunaPage()), icon: const Icon(Icons.navigate_next, color: Colors.white)),
+                  ],
+                );
+              },
+            ),
+          ),
           ListTile(
             tileColor: active == 1 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.local_mall_outlined, color: Colors.white),

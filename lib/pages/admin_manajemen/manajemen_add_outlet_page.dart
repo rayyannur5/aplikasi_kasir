@@ -44,14 +44,14 @@ class _AddOutletPageState extends State<AddOutletPage> {
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(10)),
-                child: Text('ID Device       : ${widget.dataDevice['id']}'),
+                child: Text('ID Device       : ${widget.dataDevice['data'][0]['barcode']}'),
               ),
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 20),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(border: Border.all(), borderRadius: BorderRadius.circular(10)),
-                child: Text('Nama Device : ${widget.dataDevice['name']}', style: const TextStyle(overflow: TextOverflow.ellipsis)),
+                child: Text('Nama Device : ${widget.dataDevice['data'][0]['name']}', style: const TextStyle(overflow: TextOverflow.ellipsis)),
               ),
               TextFormField(
                   controller: nama,
@@ -154,7 +154,7 @@ class _AddOutletPageState extends State<AddOutletPage> {
                       var loginData = await Local.getLogin();
                       if (loginData['value']) {
                         var pref = await SharedPreferences.getInstance();
-                        await pref.setString("temp_add_outlet_device_id", widget.dataDevice['id']);
+                        await pref.setString("temp_add_outlet_device_id", widget.dataDevice['data'][0]['barcode']);
                         await pref.setString("temp_add_outlet_name", nama.text);
                         await pref.setDouble("temp_add_outlet_lat", lat);
                         await pref.setDouble("temp_add_outlet_lon", lon);
@@ -162,7 +162,7 @@ class _AddOutletPageState extends State<AddOutletPage> {
                         push(context, const ManajemenAddOutletMotorPage());
                       } else {
                         var pref = await SharedPreferences.getInstance();
-                        await pref.setString("temp_add_outlet_device_id", widget.dataDevice['id']);
+                        await pref.setString("temp_add_outlet_device_id", widget.dataDevice['data'][0]['barcode']);
                         await pref.setString("temp_add_outlet_name", nama.text);
                         await pref.setDouble("temp_add_outlet_lat", lat);
                         await pref.setDouble("temp_add_outlet_lon", lon);

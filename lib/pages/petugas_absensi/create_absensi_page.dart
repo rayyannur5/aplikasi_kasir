@@ -115,12 +115,15 @@ class CreateAbsensiPage extends StatelessWidget {
                                         context: context,
                                         builder: (context) =>
                                             CupertinoAlertDialog(content: const Text('Pilih Outlet Terlebih Dahulu'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
+                                    setstate(() => kirim = false);
+
                                     return;
                                   } else if (selectedShift == null) {
                                     showCupertinoDialog(
                                         context: context,
                                         builder: (context) =>
                                             CupertinoAlertDialog(content: const Text('Pilih Shift Terlebih Dahulu'), actions: [TextButton(onPressed: () => pop(context), child: const Text('Ok'))]));
+                                    setstate(() => kirim = false);
                                     return;
                                   }
                                   var jarak = Geolocator.distanceBetween(double.parse(selectedOutlet!['lat']), double.parse(selectedOutlet!['lon']), position.latitude, position.longitude);

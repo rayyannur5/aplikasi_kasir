@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:aplikasi_kasir/api/local.dart';
 import 'package:aplikasi_kasir/api/services.dart';
+import 'package:aplikasi_kasir/pages/account_hold_page.dart';
 import 'package:aplikasi_kasir/pages/auth/not_verified_page.dart';
 import 'package:aplikasi_kasir/pages/auth/register_page.dart';
 import 'package:aplikasi_kasir/pages/admin_dashboard/dashboard_page.dart';
@@ -118,13 +119,21 @@ class _LoginPageState extends State<LoginPage> {
       Map response = await Services.login(email.text, password.text);
       if (response['success']) {
         var userData = await Local.getUserData();
+        print(userData);
         if (userData['user_role'] == 'admin') {
-          pushAndRemoveUntil(context, const DashboardPage());
-        } else {
-          if (response['data'][0]['active'] == '1') {
-            pushAndRemoveUntil(context, KatalogPage(role: 'user'));
+          if (userData['user_active'] == '0') {
+            pushAndRemoveUntil(context, AccountHold('admin'));
           } else {
+            pushAndRemoveUntil(context, const DashboardPage());
+          }
+        } else {
+          print("LOGIN : " + response.toString());
+          if (response['data'][0]['active'] == '0') {
             pushAndRemoveUntil(context, const NotVerifiedPage());
+          } else if (response['data'][0]['admin_active'] == '0') {
+            pushAndRemoveUntil(context, AccountHold('user'));
+          } else {
+            pushAndRemoveUntil(context, KatalogPage(role: 'user'));
           }
         }
       } else {

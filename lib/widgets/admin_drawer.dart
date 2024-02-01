@@ -7,14 +7,17 @@ import 'package:aplikasi_kasir/pages/admin_laporan/laporan_ai_device_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_perbandingan_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_petugas/laporan_petugas_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_petugas/laporan_tambahan_petugas_page.dart';
+import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_month_page.dart';
 import 'package:aplikasi_kasir/pages/admin_laporan/laporan_transaksi/laporan_transaksi_year_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_city_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_layanan_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_outlet_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_petugas_page.dart';
 import 'package:aplikasi_kasir/pages/admin_manajemen/manajemen_shift_page.dart';
+import 'package:aplikasi_kasir/pages/admin_pembayaran/pembayaran_page.dart';
 import 'package:aplikasi_kasir/pages/auth/onboarding_page.dart';
 import 'package:aplikasi_kasir/pages/auth/profil_pengguna_page.dart';
+import 'package:aplikasi_kasir/pages/auth/register_brand_page.dart';
 import 'package:aplikasi_kasir/pages/katalog/katalog_page.dart';
 import 'package:aplikasi_kasir/utils/navigator.dart';
 import 'package:flutter/cupertino.dart';
@@ -51,34 +54,34 @@ class DrawerAdmin extends StatelessWidget {
       child: ListView(
         children: [
           DrawerHeader(
-              child: Row(
-            // crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/logo.png', scale: 1.5),
-              FutureBuilder<Map>(
+              child: FutureBuilder(
                   future: Local.getUserData(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) return const SizedBox();
-                    var data = snapshot.data!;
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    return Row(
+                      // crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          data['user_name'],
-                          style: TextStyles.h2Light,
+                        SizedBox(height: 50, width: 50, child: ClipOval(child: Image.network(snapshot.data!['user_profile_picture'], scale: 1.5))),
+                        const SizedBox(width: 10),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              snapshot.data!['user_name'],
+                              style: TextStyles.h2Light,
+                            ),
+                            Text(
+                              snapshot.data!['user_email'],
+                              style: TextStyles.pLight,
+                            ),
+                          ],
                         ),
-                        Text(
-                          data['user_email'],
-                          style: TextStyles.pLight,
-                        ),
+                        const Spacer(),
+                        IconButton(onPressed: () => navigate(context, 12, ProfilPenggunaPage()), icon: const Icon(Icons.navigate_next, color: Colors.white)),
                       ],
                     );
-                  }),
-              const Spacer(),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.navigate_next, color: Colors.white)),
-            ],
-          )),
+                  })),
           ListTile(
             tileColor: active == 1 ? Colors.white.withOpacity(0.2) : Colors.transparent,
             leading: const Icon(Icons.dashboard_outlined, color: Colors.white),
@@ -123,6 +126,11 @@ class DrawerAdmin extends StatelessWidget {
                 title: Text('Jam Shift Outlet', style: TextStyles.pLight),
                 onTap: () => navigate(context, 7, const ManajemenShiftPage()),
               ),
+              ListTile(
+                tileColor: active == 15 ? Colors.white.withOpacity(0.2) : Colors.transparent,
+                title: Text('Nama Brand', style: TextStyles.pLight),
+                onTap: () => navigate(context, 15, RegisterBrandPage()),
+              ),
             ],
           ),
           ExpansionTile(
@@ -164,6 +172,12 @@ class DrawerAdmin extends StatelessWidget {
             leading: const Icon(Icons.account_circle_outlined, color: Colors.white),
             title: Text('Profil Pengguna', style: TextStyles.pBoldLight),
             onTap: () => navigate(context, 12, ProfilPenggunaPage()),
+          ),
+          ListTile(
+            tileColor: active == 16 ? Colors.white.withOpacity(0.2) : Colors.transparent,
+            leading: const Icon(Icons.payment, color: Colors.white),
+            title: Text('Pembayaran', style: TextStyles.pBoldLight),
+            onTap: () => navigate(context, 16, PembayaranPage()),
           ),
           ListTile(
             tileColor: active == 13 ? Colors.white.withOpacity(0.2) : Colors.transparent,

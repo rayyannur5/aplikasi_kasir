@@ -12,9 +12,7 @@ import 'package:lottie/lottie.dart';
 import '../../../api/services.dart';
 
 class AdminLaporanTransaksiHariPage extends StatefulWidget {
-  final String month;
-  final String year;
-  const AdminLaporanTransaksiHariPage({super.key, required this.month, required this.year});
+  const AdminLaporanTransaksiHariPage({super.key});
 
   @override
   State<AdminLaporanTransaksiHariPage> createState() => _AdminLaporanTransaksiHariPageState();
@@ -31,7 +29,7 @@ class _AdminLaporanTransaksiHariPageState extends State<AdminLaporanTransaksiHar
           setState(() {});
         },
         child: FutureBuilder(
-          future: Services.getDayReportTransaction(widget.month, widget.year),
+          future: Services.getDayReportTransaction(DateTime.now()),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: LottieBuilder.asset('assets/lotties/loading.json'));
@@ -47,7 +45,7 @@ class _AdminLaporanTransaksiHariPageState extends State<AdminLaporanTransaksiHar
               List<Map> dataGrafik = [];
               for (var element in data) {
                 dataGrafik.add({
-                  'label': DateFormat("d MMMM yyyy", "id_ID").format(DateTime.parse(element['hari'])),
+                  'label': "  " + DateFormat("d MMMM yyyy", "id_ID").format(DateTime.parse(element['hari'])),
                   'value': int.parse(element['transaksi']),
                 });
               }
@@ -56,14 +54,17 @@ class _AdminLaporanTransaksiHariPageState extends State<AdminLaporanTransaksiHar
                 padding: const EdgeInsets.all(20),
                 children: [
                   CustomChartWithLabel(data: dataGrafik),
+                  Divider(),
                   ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: data.length,
                     itemBuilder: (context, index) => Card(
+                      color: Colors.white,
                       child: ListTile(
                         title: Text(DateFormat("d MMMM yyyy", "id_ID").format(DateTime.parse(data[index]['hari'])), style: TextStyles.h2),
                         subtitle: Text("${numberFormat.format(int.parse(data[index]['transaksi']))} Transaksi"),
+                        trailing: Icon(Icons.navigate_next),
                         onTap: () => Future.delayed(
                           const Duration(milliseconds: 200),
                           () => push(

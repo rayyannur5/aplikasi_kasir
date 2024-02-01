@@ -30,6 +30,7 @@ class KatalogPage extends StatelessWidget {
   List dataTRX = [];
   int maxNotSent = 0;
   bool hide = false;
+  bool isActive = true;
   int countError = 0;
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -241,8 +242,9 @@ class KatalogPage extends StatelessWidget {
                   searchBar(context),
                   storeDropDown(),
                   ValueListenableBuilder(
-                      valueListenable: refreshItem,
-                      builder: (context, val, _) {
+                    valueListenable: refreshItem,
+                    builder: (context, val, _) {
+                      if (isActive) {
                         return FutureBuilder(
                           future: Product.get(selectedStore),
                           builder: (context, snapshot) {
@@ -273,7 +275,20 @@ class KatalogPage extends StatelessWidget {
                             }
                           },
                         );
-                      }),
+                      } else {
+                        return Center(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 100),
+                              Image.asset('assets/images/warning.webp'),
+                              const SizedBox(height: 10),
+                              Text('Outlet tidak aktif', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                  ),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -386,6 +401,9 @@ class KatalogPage extends StatelessWidget {
           List data = snapshot.data['data'];
           if (firstOpen) {
             selectedStore = data.first['id'];
+            if (data.first['active'] == '0') {
+              isActive = false;
+            }
             firstOpen = false;
             refresh();
           }
@@ -397,6 +415,15 @@ class KatalogPage extends StatelessWidget {
             onChanged: (value) {
               search.text = "";
               selectedStore = value as String;
+              data.forEach((element) {
+                if (element['id'] == selectedStore) {
+                  if (element['active'] == '0') {
+                    isActive = false;
+                  } else {
+                    isActive = true;
+                  }
+                }
+              });
               dataItems = [];
               refreshItem.value = !refreshItem.value;
             },

@@ -66,7 +66,7 @@ class _ManajemenAddOutletMobilPageState extends State<ManajemenAddOutletMobilPag
                         if (createStoresResp['success']) {
                           pushAndRemoveUntil(context, ManajemenOutletPage());
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("LOGIN : " + createStoresResp['errors'])));
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(createStoresResp['errors'])));
                         }
                       } else {
                         var registerResp = await Services().register();
@@ -76,7 +76,7 @@ class _ManajemenAddOutletMobilPageState extends State<ManajemenAddOutletMobilPag
                           if (createStoresResp['success']) {
                             pushAndRemoveUntil(context, const DashboardPage());
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("LOGOUT : " + createStoresResp['errors'])));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(createStoresResp['errors'])));
                           }
                         } else {
                           setState(() => isLoading = false);
